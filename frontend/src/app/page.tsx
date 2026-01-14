@@ -1,102 +1,110 @@
-import Image from "next/image";
+import React from 'react';
+import { MapPin, Filter, ShieldCheck, Github, ExternalLink, Activity } from 'lucide-react';
+import Link from 'next/link';
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-[#0F172A] text-slate-200 font-sans">
+      {/* Navigation */}
+      <nav className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="bg-orange-600 p-1.5 rounded-lg">
+            <Activity size={24} className="text-white" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white">CrisisAid</span>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        <Link href="/admin" className="text-sm font-medium hover:text-orange-500 transition">
+          Admin Login
+        </Link>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="relative pt-20 pb-16 px-6 overflow-hidden">
+        {/* Subtle Background Map Overlay Effect */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/world-map.png')] bg-center bg-no-repeat"></div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <span className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-orange-500 uppercase bg-orange-500/10 border border-orange-500/20 rounded-full">
+            Real-Time Crisis Response
+          </span>
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6">
+            Find Emergency Help Faster—<span className="text-orange-600">When Every Second Counts</span>
+          </h1>
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+            CrisisAid helps people locate verified shelters, food, medical aid, water, and power in real time during disasters and emergencies.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/map" className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(234,88,12,0.4)]">
+              View Emergency Map
+            </Link>
+            <Link href="/submit" className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold text-lg transition-all">
+              Submit a Resource
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Live Stats Bar */}
+      <div className="max-w-5xl mx-auto px-6 mb-20">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 flex flex-wrap justify-center gap-8 md:gap-16 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="text-slate-400">142 Active Shelters</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span className="text-slate-400">89 Water Points</span>
+          </div>
+          <div className="flex items-center gap-2 text-orange-400 font-medium">
+            <ShieldCheck size={16} />
+            <span>Verified 2m ago</span>
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works */}
+      <section className="max-w-7xl mx-auto px-6 py-20 border-t border-slate-800">
+        <h2 className="text-3xl font-bold text-center mb-16">How It Works</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { icon: <MapPin className="text-orange-500" />, title: "1. Open the Map", desc: "Auto-detects your location to find the closest aid stations instantly." },
+            { icon: <Filter className="text-blue-500" />, title: "2. Filter Nearby Help", desc: "Search for specific needs: medical aid, food, or emergency power." },
+            { icon: <ShieldCheck className="text-green-500" />, title: "3. Get Assistance", desc: "Follow GPS-enabled directions to verified, active locations." }
+          ].map((item, i) => (
+            <div key={i} className="p-8 bg-slate-800/30 border border-slate-800 rounded-2xl hover:border-slate-700 transition">
+              <div className="mb-4 bg-slate-900 w-fit p-3 rounded-lg">{item.icon}</div>
+              <h3 className="text-xl font-bold mb-2 text-white">{item.title}</h3>
+              <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Impact Section */}
+      <section className="bg-slate-900/50 py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-6 text-white">Our Impact</h2>
+          <p className="text-lg text-slate-400 leading-relaxed">
+            In times of crisis, reliable information saves lives. CrisisAid empowers communities with real-time data, reducing response times and connecting people to critical aid when it matters most.
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-slate-800 text-center">
+        <div className="flex justify-center gap-6 mb-6">
+          <Link href="https://github.com" className="hover:text-white transition flex items-center gap-2">
+            <Github size={20} /> Github
+          </Link>
+          <Link href="#" className="hover:text-white transition flex items-center gap-2">
+            <ExternalLink size={20} /> Devpost
+          </Link>
+        </div>
+        <p className="text-slate-500 text-sm italic">
+          Built for the 2024 Crisis Management Hackathon
+        </p>
+        <p className="text-slate-600 text-xs mt-4">© 2024 CrisisAid Project</p>
       </footer>
     </div>
   );
