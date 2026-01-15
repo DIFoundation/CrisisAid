@@ -6,7 +6,10 @@ export interface Resource {
   location: Location;
   status: ResourceStatus;
   description?: string;
-  contact?: string;
+  contactInfo?: {
+    phone: string,
+    email: string,
+  };
   verified: boolean;
   lastUpdated: string;
   capacity?: number;

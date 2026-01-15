@@ -42,7 +42,10 @@ export const mockResources: Resource[] = [
     },
     status: 'available',
     description: '24/7 Emergency services available',
-    contact: '+15551234567',
+    contactInfo: {
+      phone: '+15551234567',
+      email: 'admin@crisisaid.org',
+    },
     verified: true,
     lastUpdated: new Date().toISOString(),
     capacity: 200,
@@ -62,7 +65,10 @@ export const mockResources: Resource[] = [
     },
     status: 'limited',
     description: 'Emergency shelter with food and basic amenities',
-    contact: '+15552345678',
+    contactInfo: {
+      phone: '+12345672345',
+      email: 'asdfgh@jlj.org'
+    },
     verified: true,
     lastUpdated: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     capacity: 100,
@@ -131,7 +137,10 @@ export const mockSubmissions: Submission[] = [
       },
       status: 'available',
       description: 'Free food distribution for affected residents',
-      contact: '+15553456789',
+      contactInfo: {
+        phone: '+15553456789',
+        email: 'jkwqboua@mdl.com'
+      },
       capacity: 50,
       currentOccupancy: 0,
       notes: 'Open 9am-5pm daily',
@@ -154,7 +163,10 @@ export const mockSubmissions: Submission[] = [
       },
       status: 'available',
       description: 'Mobile clinic providing first aid and basic medical care',
-      contact: '+15554567890',
+      contactInfo: {
+        phone: '+15554567890',
+        email: 'jqbeosjbk@ksb.org'
+      },
       notes: 'No appointment needed',
     },
     submittedBy: 'user-3',

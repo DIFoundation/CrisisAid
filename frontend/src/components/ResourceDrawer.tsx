@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, MapPin, Clock, Phone, Globe, AlertTriangle, CheckCircle, XCircle, User, Shield } from 'lucide-react';
+import { X, MapPin, Clock, Phone, Globe, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail } from 'lucide-react';
 import { Resource } from '@/data/types';
 import { useAppContext } from '@/data/context/AppContext';
 
@@ -30,12 +30,12 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
   };
 
   const getContactInfo = () => {
-    if (!resource.contactInfo) return null;
+    if (!resource.location) return null;
     
     return (
       <div className="mt-4 space-y-2">
         <h4 className="text-sm font-medium text-foreground/80">Contact Information</h4>
-        {resource.contactInfo.phone && (
+        {resource.contactInfo && (
           <div className="flex items-center text-sm text-foreground/70">
             <Phone className="w-4 h-4 mr-2 text-primary" />
             <a href={`tel:${resource.contactInfo.phone}`} className="hover:underline">
@@ -43,7 +43,7 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
             </a>
           </div>
         )}
-        {resource.contactInfo.email && (
+        {resource.contactInfo && (
           <div className="flex items-center text-sm text-foreground/70">
             <Mail className="w-4 h-4 mr-2 text-primary" />
             <a href={`mailto:${resource.contactInfo.email}`} className="hover:underline">
@@ -51,7 +51,7 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
             </a>
           </div>
         )}
-        {resource.contactInfo.website && (
+        {/* {resource.contactInfo.website && (
           <div className="flex items-center text-sm text-foreground/70">
             <Globe className="w-4 h-4 mr-2 text-primary" />
             <a 
@@ -65,7 +65,7 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
               {resource.contactInfo.website}
             </a>
           </div>
-        )}
+        )} */}
       </div>
     );
   };

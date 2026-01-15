@@ -113,7 +113,7 @@ export default function MapPage() {
       <CriticalAlert key={alerts.length} />
       
       {/* Top Header / Search */}
-      <div className="absolute top-20 md:top-6 left-0 right-0 z-1500 px-4 pointer-events-none">
+      <div className="absolute top-20 md:top-6 left-0 right-0 z-50 px-4 pointer-events-none">
         <div className="pointer-events-auto">
           <TopSearchBar 
             onSearch={handleSearch} 
