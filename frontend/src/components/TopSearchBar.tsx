@@ -15,8 +15,10 @@ export default function TopSearchBar() {
     <div className="w-full max-w-xl mx-auto">
       <div className="relative group">
         {/* Search Input */}
-        <div className={`flex items-center bg-slate-900/90 backdrop-blur-md border ${isFocused ? 'border-orange-500 shadow-[0_0_20px_rgba(234,88,12,0.2)]' : 'border-slate-700'} rounded-2xl p-2 transition-all`}>
-          <Search className="ml-3 text-slate-500" size={20} />
+        <div className={`flex items-center bg-card-dark/90 backdrop-blur-md border-2 ${
+          isFocused ? 'border-primary shadow-[0_0_20px_rgba(30,58,138,0.3)]' : 'border-light-bg/10'
+        } rounded-2xl p-2 transition-all`}>
+          <Search className="ml-3 text-light-bg/60" size={20} />
           <input 
             type="text"
             value={query}
@@ -24,29 +26,32 @@ export default function TopSearchBar() {
             onBlur={() => setTimeout(() => setIsFocused(false), 200)}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for shelter, water, or address..."
-            className="w-full bg-transparent border-none focus:ring-0 text-white p-3 text-sm"
+            className="w-full bg-transparent border-none focus:ring-0 text-light-bg placeholder-light-bg/60 p-3 text-sm"
           />
-          <button className="bg-slate-800 p-2.5 rounded-xl text-orange-500 hover:bg-slate-700 transition">
+          <button 
+            className="bg-primary/10 p-2.5 rounded-xl text-primary hover:bg-primary/20 transition-colors"
+            aria-label="Use current location"
+          >
             <Navigation size={18} />
           </button>
         </div>
 
         {/* Suggestions Dropdown */}
         {isFocused && (
-          <div className="absolute top-full mt-2 w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-3000">
+          <div className="absolute top-full mt-2 w-full bg-card-dark border-2 border-light-bg/10 rounded-2xl shadow-2xl overflow-hidden z-3000 backdrop-blur-md">
             <div className="p-2">
-              <p className="text-[10px] font-bold text-slate-500 uppercase px-3 py-2 tracking-widest">Recent & Suggested</p>
+              <p className="text-[10px] font-bold text-light-bg/60 uppercase px-3 py-2 tracking-widest">Recent & Suggested</p>
               {suggestions.map((s, i) => (
                 <button 
                   key={i}
-                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-slate-800 transition text-left group"
+                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-card-light/5 transition-colors text-left group"
                 >
-                  <div className="bg-slate-800 group-hover:bg-slate-700 p-2 rounded-lg">
-                    <MapPin size={16} className="text-slate-400" />
+                  <div className="bg-primary/10 group-hover:bg-primary/20 p-2 rounded-lg transition-colors">
+                    <MapPin size={16} className="text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">{s.name}</p>
-                    <p className="text-xs text-slate-500">{s.address}</p>
+                    <p className="text-sm font-bold text-light-bg">{s.name}</p>
+                    <p className="text-xs text-light-bg/60">{s.address}</p>
                   </div>
                 </button>
               ))}

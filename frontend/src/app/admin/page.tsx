@@ -13,23 +13,23 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex">
+    <div className="min-h-screen bg-dark-bg text-light-bg flex">
       {/* Sidebar - Desktop */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 hidden md:flex flex-col">
-        <div className="p-6 border-b border-slate-800 flex items-center gap-2">
-          <ShieldCheck className="text-orange-500" />
-          <span className="font-bold text-lg text-white">CrisisAid Admin</span>
+      <aside className="w-64 bg-card-dark border-r border-light-bg/10 hidden md:flex flex-col">
+        <div className="p-6 border-b border-light-bg/10 flex items-center gap-2">
+          <ShieldCheck className="text-primary" />
+          <span className="font-bold text-lg text-light-bg">CrisisAid Admin</span>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <button className="w-full flex items-center gap-3 px-4 py-3 bg-orange-600/10 text-orange-500 rounded-lg font-medium">
+          <button className="w-full flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-medium">
             <LayoutDashboard size={20} /> Dashboard
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-lg transition">
+          <button className="w-full flex items-center gap-3 px-4 py-3 text-light-bg/60 hover:bg-card-light/5 rounded-lg transition-colors">
             <Clock size={20} /> Audit Log
           </button>
         </nav>
-        <div className="p-4 border-t border-slate-800">
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 transition">
+        <div className="p-4 border-t border-light-bg/10">
+          <button className="w-full flex items-center gap-3 px-4 py-3 text-light-bg/60 hover:text-danger transition-colors">
             <LogOut size={20} /> Logout
           </button>
         </div>
@@ -38,18 +38,18 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
         {/* Top Header */}
-        <header className="h-16 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between px-8">
-          <h2 className="text-xl font-semibold text-white">Resource Moderation</h2>
+        <header className="h-16 border-b border-light-bg/10 bg-card-dark/50 flex items-center justify-between px-8">
+          <h2 className="text-xl font-semibold text-light-bg">Resource Moderation</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-light-bg/50" />
               <input 
                 type="text" 
                 placeholder="Search submissions..." 
-                className="bg-slate-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-orange-500 w-64"
+                className="bg-card-light/5 border border-light-bg/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:outline-none w-64 text-light-bg placeholder-light-bg/40"
               />
             </div>
-            <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center font-bold text-xs text-white">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
               JD
             </div>
           </div>
@@ -57,25 +57,25 @@ export default function AdminDashboard() {
 
         {/* Stats Row */}
         <section className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-            <p className="text-slate-400 text-sm mb-1">Pending Approval</p>
-            <p className="text-3xl font-bold text-white">14</p>
+          <div className="bg-card-dark p-6 rounded-2xl border border-light-bg/10">
+            <p className="text-light-bg/60 text-sm mb-1">Pending Approval</p>
+            <p className="text-3xl font-bold text-light-bg">14</p>
           </div>
-          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-            <p className="text-slate-400 text-sm mb-1">Verified Resources</p>
-            <p className="text-3xl font-bold text-green-500">284</p>
+          <div className="bg-card-dark p-6 rounded-2xl border border-light-bg/10">
+            <p className="text-light-bg/60 text-sm mb-1">Verified Resources</p>
+            <p className="text-3xl font-bold text-success">284</p>
           </div>
-          <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-            <p className="text-slate-400 text-sm mb-1">Reports Today</p>
-            <p className="text-3xl font-bold text-orange-500">42</p>
+          <div className="bg-card-dark p-6 rounded-2xl border border-light-bg/10">
+            <p className="text-light-bg/60 text-sm mb-1">Reports Today</p>
+            <p className="text-3xl font-bold text-warning">42</p>
           </div>
         </section>
 
         {/* Table Section */}
         <section className="px-8 pb-8">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <div className="bg-card-dark border border-light-bg/10 rounded-2xl overflow-hidden">
             <table className="w-full text-left">
-              <thead className="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider">
+              <thead className="bg-card-light/5 text-light-bg/60 text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-4 font-semibold">Resource Name</th>
                   <th className="px-6 py-4 font-semibold">Category</th>
@@ -84,42 +84,51 @@ export default function AdminDashboard() {
                   <th className="px-6 py-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-light-bg/10">
                 {resources.map((res) => (
-                  <tr key={res.id} className="hover:bg-slate-800/30 transition group">
+                  <tr key={res.id} className="hover:bg-card-light/5 transition-colors group">
                     <td className="px-6 py-4">
-                      <div className="font-medium text-white">{res.name}</div>
-                      <div className="text-xs text-slate-500 flex items-center gap-1">
+                      <div className="font-medium text-light-bg">{res.name}</div>
+                      <div className="text-xs text-light-bg/50 flex items-center gap-1 hover:text-primary transition-colors cursor-pointer">
                         <ExternalLink size={10} /> View on Map
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 border border-slate-700">
+                      <span className="px-3 py-1 bg-card-light/10 rounded-full text-xs text-light-bg/80 border border-light-bg/10">
                         {res.type}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`flex items-center gap-1.5 text-xs font-bold ${
-                        res.status === 'Approved' ? 'text-green-500' : 'text-yellow-500'
+                        res.status === 'Approved' ? 'text-success' : 'text-warning'
                       }`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${
-                          res.status === 'Approved' ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'
+                          res.status === 'Approved' ? 'bg-success' : 'bg-warning animate-pulse'
                         }`} />
                         {res.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">{res.time}</td>
+                    <td className="px-6 py-4 text-sm text-light-bg/60">{res.time}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
                         {res.status === 'Pending' && (
-                          <button className="p-2 bg-green-600/10 text-green-500 hover:bg-green-600 hover:text-white rounded-lg transition" title="Approve">
+                          <button 
+                            className="p-2 bg-success/10 text-success hover:bg-success/20 rounded-lg transition-colors" 
+                            title="Approve"
+                          >
                             <Check size={18} />
                           </button>
                         )}
-                        <button className="p-2 bg-slate-800 text-slate-400 hover:text-white rounded-lg transition">
+                        <button 
+                          className="p-2 bg-card-light/5 text-light-bg/60 hover:text-primary hover:bg-card-light/10 rounded-lg transition-colors"
+                          title="Edit"
+                        >
                           <Edit2 size={18} />
                         </button>
-                        <button className="p-2 bg-slate-800 text-slate-400 hover:text-red-500 rounded-lg transition">
+                        <button 
+                          className="p-2 bg-card-light/5 text-light-bg/60 hover:text-danger hover:bg-card-light/10 rounded-lg transition-colors"
+                          title="Delete"
+                        >
                           <Trash2 size={18} />
                         </button>
                       </div>
