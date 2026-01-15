@@ -4,18 +4,18 @@ import Link from 'next/link';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-(--dark-bg) text-(--light-bg) font-sans">
+    <div className="min-h-screen bg-dark-bg text-light-bg font-sans">
       {/* Navigation */}
       <nav className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="bg-primary p-1.5 rounded-lg">
             <Activity size={24} className="text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">CrisisAid</span>
+          <span className="text-xl font-bold tracking-tight text-light-bg">CrisisAid</span>
         </div>
         <Link 
-          href="/admin" 
-          className="text-sm font-medium text-primary hover:text-secondary transition"
+          href="/login" 
+          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors px-4 py-2 rounded-lg hover:bg-primary/10"
         >
           Admin Login
         </Link>
@@ -27,13 +27,13 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/world-map.png')] bg-center bg-no-repeat"></div>
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <span className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-primary uppercase bg-(--card-dark) border border-(--primary)/20 rounded-full">
+          <span className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-primary uppercase bg-card-dark border border-primary/20 rounded-full">
             Real-Time Crisis Response
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6">
             Find Emergency Help Faster—<span className="text-secondary">When Every Second Counts</span>
           </h1>
-          <p className="text-xl text-(--light-bg)/80 max-w-2xl mx-auto mb-10">
+          <p className="text-xl text-light-bg/80 max-w-2xl mx-auto mb-10">
             CrisisAid helps people locate verified shelters, food, medical aid, water, and power in real time during disasters and emergencies.
           </p>
           
@@ -73,7 +73,7 @@ export default function LandingPage() {
       </div>
 
       {/* How It Works */}
-      <section className="max-w-7xl mx-auto px-6 py-20 border-t border-(--card-dark)">
+      <section className="max-w-7xl mx-auto px-6 py-20 border-t border-card-dark">
         <h2 className="text-3xl font-bold text-center mb-16">How It Works</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[

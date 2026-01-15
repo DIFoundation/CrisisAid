@@ -15,17 +15,18 @@ export default function CriticalAlert() {
           exit={{ y: -100, opacity: 0 }}
           className="fixed top-4 left-1/2 -translate-x-1/2 z-2000 w-[90%] max-w-lg"
         >
-          <div className="bg-red-600 text-white p-4 rounded-2xl shadow-[0_0_30px_rgba(220,38,38,0.4)] border border-red-500 flex items-center gap-4">
+          <div className="bg-danger/90 text-white p-4 rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.4)] border border-danger/80 flex items-center gap-4 backdrop-blur-sm">
             <div className="bg-white/20 p-2 rounded-full animate-pulse">
-              <Megaphone size={20} />
+              <Megaphone size={20} className="text-white" />
             </div>
             <div className="flex-1">
               <h4 className="font-bold text-sm leading-tight">EMERGENCY BROADCAST</h4>
-              <p className="text-xs text-red-10 font-medium">Flash flood warning for North Sector. Move to higher ground immediately.</p>
+              <p className="text-xs text-white/90 font-medium">Flash flood warning for North Sector. Move to higher ground immediately.</p>
             </div>
             <button 
               onClick={() => setVisible(false)}
-              className="p-1 hover:bg-white/10 rounded-lg transition"
+              className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+              aria-label="Dismiss alert"
             >
               <X size={18} />
             </button>
