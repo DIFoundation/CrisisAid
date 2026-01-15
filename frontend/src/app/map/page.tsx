@@ -6,6 +6,7 @@ import {
   ChevronUp, RefreshCw, Plus
 } from 'lucide-react';
 import Link from 'next/link';
+import LeafletMap from '@/components/LeafletMap';
 
 export default function MapPage() {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -38,7 +39,9 @@ export default function MapPage() {
 
       {/* Map Placeholder (Simulating Mapbox/Leaflet) */}
       <div className="flex-1 bg-slate-800 relative">
-        <div className="absolute inset-0 opacity-40 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/-122.41,37.77,12/800x600?access_token=YOUR_TOKEN')] bg-cover bg-center" />
+        <div className="absolute inset-0 opacity-40 bg-cover bg-center">
+          <LeafletMap />
+        </div>
         
         {/* Mock Markers */}
         <div className="absolute top-1/2 left-1/3 -translate-y-1/2 -translate-x-1/2 group cursor-pointer">
