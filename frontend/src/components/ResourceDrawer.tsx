@@ -7,6 +7,7 @@ import {
 
 export default function ResourceDrawer() {
   const [isOpen, setIsOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedAid, setSelectedAid] = useState<any>(null);
 
   // Mock data for the list
