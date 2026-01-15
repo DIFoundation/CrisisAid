@@ -115,7 +115,7 @@ export default function CriticalAlert() {
           
           <button 
             onClick={() => handleDismiss(visibleAlert.id)}
-            className="p-1 hover:bg-white/20 rounded-full transition-colors flex-shrink-0"
+            className="p-1 hover:bg-white/20 rounded-full transition-colors shrink-0"
             aria-label="Dismiss alert"
           >
             <X size={18} className="text-white" />

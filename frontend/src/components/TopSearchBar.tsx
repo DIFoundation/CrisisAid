@@ -1,63 +1,173 @@
 "use client";
-import React, { useState } from 'react';
-import { Search, MapPin, Navigation } from 'lucide-react';
 
-export default function TopSearchBar() {
-  const [query, setQuery] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Search, X, Filter, MapPin, Droplet, Stethoscope, Home, Battery, Utensils, ChevronDown } from 'lucide-react';
+import { Resource } from '@/data/types';
 
-  const suggestions = [
-    { name: "City Center Shelter", address: "450 Main St" },
-    { name: "Red Cross Station", address: "12 Healthcare Blvd" }
-  ];
+interface ResourceTypeOption {
+  id: string;
+  name: string;
+  icon?: any; // Optional icon
+  color?: string; // Optional color
+}
+
+interface TopSearchBarProps {
+  onSearch: (query: string, type?: string) => void;
+  onFilterChange?: (type: string) => void;
+  resourceTypes?: ResourceTypeOption[];
+}
+
+// Default resource types in case none are provided
+const defaultResourceTypes: ResourceTypeOption[] = [
+  { id: 'all', name: 'All Resources', icon: MapPin, color: 'bg-primary' },
+  { id: 'water', name: 'Water', icon: Droplet, color: 'bg-blue-500' },
+  { id: 'medical', name: 'Medical', icon: Stethoscope, color: 'bg-danger' },
+  { id: 'shelter', name: 'Shelter', icon: Home, color: 'bg-secondary' },
+  { id: 'food', name: 'Food', icon: Utensils, color: 'bg-warning' },
+  { id: 'power', name: 'Power', icon: Battery, color: 'bg-success' },
+];
+
+export default function TopSearchBar({ 
+  onSearch, 
+  onFilterChange, 
+  resourceTypes = defaultResourceTypes 
+}: TopSearchBarProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [isScrolled, setIsScrolled] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Find the selected type data or fallback to 'all'
+  const selectedTypeData = useMemo(() => {
+    const found = resourceTypes.find(type => type.id === selectedType);
+    return found || resourceTypes[0] || { id: 'all', name: 'All Resources' };
+  }, [selectedType, resourceTypes]);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsTypeDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handle scroll for shadow effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchQuery, selectedType === 'all' ? undefined : selectedType);
+  };
+
+  const handleTypeSelect = (type: string) => {
+    setSelectedType(type);
+    setIsTypeDropdownOpen(false);
+    onSearch(searchQuery, type === 'all' ? undefined : type);
+    if (onFilterChange) {
+      onFilterChange(type === 'all' ? '' : type);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    onSearch('', selectedType === 'all' ? undefined : selectedType);
+  };
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <div className="relative group">
-        {/* Search Input */}
-        <div className={`flex items-center bg-card-dark/90 backdrop-blur-md border-2 ${
-          isFocused ? 'border-primary shadow-[0_0_20px_rgba(30,58,138,0.3)]' : 'border-light-bg/10'
-        } rounded-2xl p-2 transition-all`}>
-          <Search className="ml-3 text-light-bg/60" size={20} />
-          <input 
-            type="text"
-            value={query}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for shelter, water, or address..."
-            className="w-full bg-transparent border-none focus:ring-0 text-light-bg placeholder-light-bg/60 p-3 text-sm"
-          />
-          <button 
-            className="bg-primary/10 p-2.5 rounded-xl text-primary hover:bg-primary/20 transition-colors"
-            aria-label="Use current location"
-          >
-            <Navigation size={18} />
-          </button>
-        </div>
+    <div 
+      className={`sticky top-0 z-50 transition-all duration-200 ${
+        isScrolled ? 'bg-background/90 backdrop-blur-md shadow-md' : 'bg-background/80 backdrop-blur-sm'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Search Bar */}
+          <div className="flex-1 flex items-center">
+            <div className="relative w-full max-w-2xl">
+              <form onSubmit={handleSearch} className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-foreground/50" aria-hidden="true" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-12 py-2.5 border border-border rounded-lg bg-card text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+                  placeholder="Search for resources..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchQuery(value);
+                    if (!value) {
+                      onSearch('', selectedType === 'all' ? undefined : selectedType);
+                    }
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute inset-y-0 right-16 pr-3 flex items-center text-foreground/50 hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                )}
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <div className="h-6 w-px bg-border" />
+                  <div className="hidden md:flex items-center ml-4 relative" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      className="inline-flex items-center px-3 py-2 border border-border rounded-lg bg-card text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                      onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+                    >
+                      {selectedTypeData.icon && (
+                        <selectedTypeData.icon className="h-4 w-4 mr-2" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {selectedTypeData.name}
+                      </span>
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </button>
 
-        {/* Suggestions Dropdown */}
-        {isFocused && (
-          <div className="absolute top-full mt-2 w-full bg-card-dark border-2 border-light-bg/10 rounded-2xl shadow-2xl overflow-hidden z-3000 backdrop-blur-md">
-            <div className="p-2">
-              <p className="text-[10px] font-bold text-light-bg/60 uppercase px-3 py-2 tracking-widest">Recent & Suggested</p>
-              {suggestions.map((s, i) => (
-                <button 
-                  key={i}
-                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-card-light/5 transition-colors text-left group"
-                >
-                  <div className="bg-primary/10 group-hover:bg-primary/20 p-2 rounded-lg transition-colors">
-                    <MapPin size={16} className="text-primary" />
+                    {/* Dropdown */}
+                    {isTypeDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border overflow-hidden z-50">
+                        <div className="py-1">
+                          {resourceTypes.map((type) => (
+                            <button
+                              key={type.id}
+                              className={`w-full text-left px-4 py-2 text-sm flex items-center ${
+                                selectedType === type.id
+                                  ? 'bg-accent text-accent-foreground'
+                                  : 'text-foreground hover:bg-accent/50'
+                              }`}
+                              onClick={() => handleTypeSelect(type.id)}
+                            >
+                              {type.icon && <type.icon className="h-4 w-4 mr-3" />}
+                              {type.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-light-bg">{s.name}</p>
-                    <p className="text-xs text-light-bg/60">{s.address}</p>
-                  </div>
-                </button>
-              ))}
+                </div>
+              </form>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
