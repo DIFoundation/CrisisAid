@@ -1,18 +1,16 @@
 'use client'
-import React, { useState } from 'react';
 import { 
-  LayoutDashboard, Check, X, Edit2, Trash2, 
+  LayoutDashboard, Check, Edit2, Trash2, 
   ExternalLink, Search, LogOut, ShieldCheck, Clock
 } from 'lucide-react';
-import Link from 'next/link';
 
 export default function AdminDashboard() {
   // Mock data for the MVP
-  const [resources, setResources] = useState([
+  const resources = [
     { id: 1, name: "Downtown Medical Center", type: "Medical", status: "Pending", time: "5m ago" },
     { id: 2, name: "East Side High Shelter", type: "Shelter", status: "Approved", time: "1h ago" },
     { id: 3, name: "Harbor Water Tank", type: "Water", status: "Pending", time: "12m ago" },
-  ]);
+  ];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex">

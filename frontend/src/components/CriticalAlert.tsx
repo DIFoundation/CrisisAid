@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { AlertCircle, X, Megaphone } from 'lucide-react';
+import { X, Megaphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CriticalAlert() {

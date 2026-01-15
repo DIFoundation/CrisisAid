@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  ChevronUp, ChevronDown, MapPin, 
-  Clock, ShieldCheck, Phone, Navigation, AlertTriangle 
+  ChevronUp, MapPin, Clock, ShieldCheck, Phone, Navigation, AlertTriangle 
 } from 'lucide-react';
 
 export default function ResourceDrawer() {

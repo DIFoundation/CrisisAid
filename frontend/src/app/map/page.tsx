@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { 
-  Search, Filter, Navigation, Map as MapIcon, 
+  Navigation, 
   Droplets, Stethoscope, Home, BatteryCharging, Utensils,
   RefreshCw, Plus
 } from 'lucide-react';

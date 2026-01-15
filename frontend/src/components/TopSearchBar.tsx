@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Search, MapPin, Navigation, History } from 'lucide-react';
+import { Search, MapPin, Navigation } from 'lucide-react';
 
 export default function TopSearchBar() {
   const [query, setQuery] = useState("");
