@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
-import { Droplets, Home, Stethoscope, Navigation } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for Leaflet default icon issues in Next.js

@@ -25,3 +25,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/*
+| Role            | Color   |
+| --------------- | ------- |
+| Primary         | #1E3A8A |
+| Secondary / CTA | #F97316 |
+| Success         | #22C55E |
+| Warning         | #EAB308 |
+| Danger          | #EF4444 |
+| Light BG        | #F8FAFC |
+| Dark BG         | #0F172A |
+| Card (Light)    | #FFFFFF |
+| Card (Dark)     | #1E293B | 
+*/
