@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+// import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

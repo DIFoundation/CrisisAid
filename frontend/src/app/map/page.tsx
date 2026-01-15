@@ -1,11 +1,15 @@
 'use client'
 import React, { useState } from 'react';
 import { 
-  Search, Filter, Navigation, List, Map as MapIcon, 
+  Navigation, 
   Droplets, Stethoscope, Home, BatteryCharging, Utensils,
-  ChevronUp, RefreshCw, Plus
+  RefreshCw, Plus
 } from 'lucide-react';
 import Link from 'next/link';
+import LeafletMap from '@/components/LeafletMap';
+import ResourceDrawer from '@/components/ResourceDrawer';
+import TopSearchBar from '@/components/TopSearchBar';
+import CriticalAlert from '@/components/CriticalAlert';
 
 export default function MapPage() {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -20,9 +24,15 @@ export default function MapPage() {
 
   return (
     <div className="relative h-screen w-full bg-slate-900 overflow-hidden flex flex-col">
+      <CriticalAlert />
       
       {/* Top Header / Search */}
-      <div className="absolute top-4 left-4 right-4 z-20 flex gap-2">
+      <div className="absolute top-20 md:top-6 left-0 right-0 z-1500 px-4 pointer-events-none">
+    <div className="pointer-events-auto">
+      <TopSearchBar />
+    </div>
+  </div>
+      {/* <div className="absolute top-4 left-4 right-4 z-20 flex gap-2">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
           <input 
@@ -34,11 +44,17 @@ export default function MapPage() {
         <button className="bg-white/95 p-3 rounded-xl shadow-xl text-slate-700 hover:bg-slate-100">
           <Filter size={24} />
         </button>
-      </div>
+      </div> */}
 
       {/* Map Placeholder (Simulating Mapbox/Leaflet) */}
       <div className="flex-1 bg-slate-800 relative">
-        <div className="absolute inset-0 opacity-40 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/-122.41,37.77,12/800x600?access_token=YOUR_TOKEN')] bg-cover bg-center" />
+        <div className="absolute inset-0 opacity-40 bg-cover bg-center">
+          <LeafletMap />
+        </div>
+
+        <div className="z-20">
+          <ResourceDrawer />
+        </div>
         
         {/* Mock Markers */}
         <div className="absolute top-1/2 left-1/3 -translate-y-1/2 -translate-x-1/2 group cursor-pointer">
