@@ -6,7 +6,8 @@ import { useAppContext } from '@/data/context/AppContext';
 import CriticalAlert from '@/components/CriticalAlert';
 import TopSearchBar from '@/components/TopSearchBar';
 import ResourceDrawer from '@/components/ResourceDrawer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Dynamically import the LeafletMap component to avoid SSR issues
 const LeafletMap = dynamic(() => import('@/components/LeafletMap'), {
@@ -19,6 +20,7 @@ const LeafletMap = dynamic(() => import('@/components/LeafletMap'), {
 });
 
 export default function MapPage() {
+  const router = useRouter()
   const {
     resources,
     alerts,
@@ -40,13 +42,13 @@ export default function MapPage() {
         types.add(resource.type);
       }
     });
-    
+
     // Convert to array of {id, name} objects
     const typeOptions = Array.from(types).map(type => ({
       id: type.toLowerCase(),
       name: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()
     }));
-    
+
     // Add 'All Resources' option
     return [
       { id: 'all', name: 'All Resources' },
@@ -80,17 +82,17 @@ export default function MapPage() {
 
     const lowerQuery = query.toLowerCase();
     const filtered = resources.filter((resource) => {
-      const matchesQuery = !query.trim() || 
+      const matchesQuery = !query.trim() ||
         resource.name.toLowerCase().includes(lowerQuery) ||
         resource.type.toLowerCase().includes(lowerQuery) ||
         resource.location?.address?.toLowerCase().includes(lowerQuery) ||
         resource.description?.toLowerCase().includes(lowerQuery);
-      
+
       const matchesType = !type || type === 'all' || resource.type.toLowerCase() === type.toLowerCase();
-      
+
       return matchesQuery && matchesType;
     });
-    
+
     setFilteredResources(filtered);
   };
 
@@ -108,15 +110,29 @@ export default function MapPage() {
     );
   }
 
+  const handleBackHome = () => {
+    router.push('/')
+  }
+
   return (
     <div className="relative h-screen w-full bg-dark-bg overflow-hidden flex flex-col">
       <CriticalAlert key={alerts.length} />
-      
+
+      {/* Back home */}
+      <div className="absolute top-6 left-6 z-50 px-4 pointer-events-none">
+        <button onClick={handleBackHome}>
+          <div className='flex items-center text-primary hover:text-primary/80 transition cursor-pointer'>
+            <ArrowLeft />
+            <p>Back to Home</p>
+          </div>
+        </button>
+      </div>
+
       {/* Top Header / Search */}
       <div className="absolute top-20 md:top-6 left-0 right-0 z-50 px-4 pointer-events-none">
         <div className="pointer-events-auto">
-          <TopSearchBar 
-            onSearch={handleSearch} 
+          <TopSearchBar
+            onSearch={handleSearch}
             resourceTypes={resourceTypes}
           />
         </div>
@@ -125,7 +141,7 @@ export default function MapPage() {
       {/* Map Container */}
       <div className="flex-1 bg-card-dark relative">
         <div className="absolute inset-0">
-          <LeafletMap 
+          <LeafletMap
             resources={filteredResources}
             selectedResource={selectedResource}
             onResourceSelect={handleResourceSelect}
@@ -134,10 +150,10 @@ export default function MapPage() {
       </div>
 
       {/* Resource Drawer */}
-      <ResourceDrawer 
-        isOpen={isDrawerOpen} 
-        onClose={() => setIsDrawerOpen(false)} 
-        resource={selectedResource} 
+      <ResourceDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        resource={selectedResource}
       />
     </div>
   );

@@ -88,6 +88,31 @@ export const mockResources: Resource[] = [
     },
     status: 'available',
     description: 'Bottled water distribution',
+    contactInfo: {
+      phone: '+12345672345',
+      email: 'asdfgh@jlj.org'
+    },
+    verified: true,
+    lastUpdated: new Date().toISOString(),
+    notes: 'Bring your own containers',
+  },
+  {
+    id: 'res-4',
+    name: 'Bandages',
+    type: 'medical',
+    location: { 
+      lat: 1.85,
+      lng: 1.225,
+      address: 'Cedar City',
+      city: 'UT 84720',
+      country: 'USA',
+    },
+    status: 'available',
+    description: 'Bottled water distribution',
+    contactInfo: {
+      phone: '+12345672345',
+      email: 'asdfgh@jlj.org'
+    },
     verified: true,
     lastUpdated: new Date().toISOString(),
     notes: 'Bring your own containers',

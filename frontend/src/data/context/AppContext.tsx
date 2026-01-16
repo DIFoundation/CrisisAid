@@ -136,20 +136,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSubmissions([]);
   };
 
-  // Resource actions
+  // Submit a new resource for review
   const submitResource = async (resource: Omit<Resource, 'id' | 'verified' | 'lastUpdated'>): Promise<boolean> => {
     try {
-      if (!user) return false;
+      // In a real app, you would get the current user's ID from auth context
+      const userId = user?.id || 'anonymous-user';
       
-      const response = await submissionService.submitResource(resource, user.id);
+      // Submit the resource for review
+      const response = await submissionService.submitResource(resource, userId);
+      
       if (response.data) {
-        await fetchSubmissions('pending');
+        // Add the new submission to the list
+        setSubmissions(prev => [response.data as Submission, ...prev]);
         return true;
+      } else {
+        console.error('Failed to submit resource:', response.error);
+        throw new Error(response.error || 'Failed to submit resource');
       }
-      return false;
     } catch (error) {
       console.error('Error submitting resource:', error);
-      return false;
+      throw error;
     }
   };
 
