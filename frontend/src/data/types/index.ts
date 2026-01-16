@@ -47,6 +47,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password: string;
   role: 'user' | 'admin' | 'moderator';
   organization?: string;
   lastActive: string;

@@ -6,6 +6,7 @@ export const mockUsers: User[] = [
     id: 'user-1',
     name: 'Admin User',
     email: 'admin@crisisaid.org',
+    password: 'password',
     role: 'admin',
     organization: 'CrisisAid',
     lastActive: new Date().toISOString(),
@@ -14,6 +15,7 @@ export const mockUsers: User[] = [
     id: 'user-2',
     name: 'Moderator One',
     email: 'mod1@crisisaid.org',
+    password: 'password',
     role: 'moderator',
     organization: 'CrisisAid',
     lastActive: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
@@ -22,6 +24,7 @@ export const mockUsers: User[] = [
     id: 'user-3',
     name: 'Community Member',
     email: 'user@example.com',
+    password: 'password',
     role: 'user',
     lastActive: new Date().toISOString(),
   },
@@ -69,7 +72,7 @@ export const mockResources: Resource[] = [
       phone: '+12345672345',
       email: 'asdfgh@jlj.org'
     },
-    verified: true,
+    verified: false,
     lastUpdated: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     capacity: 100,
     currentOccupancy: 90,
