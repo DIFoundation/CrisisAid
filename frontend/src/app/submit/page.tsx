@@ -19,8 +19,8 @@ export default function SubmitResource() {
     name: '',
     type: 'shelter',
     location: {
-      lat: 0,
-      lng: 0,
+      lat: '',
+      lng: '',
       address: '',
       city: '',
       country: ''
@@ -61,7 +61,7 @@ export default function SubmitResource() {
   };
 
   // Handle location selection from map
-  const handleLocationSelect = (lat: number, lng: number, address: string) => {
+  const handleLocationSelect = (lat: string, lng: string, address: string) => {
     setFormData(prev => ({
       ...prev,
       location: {
@@ -96,8 +96,8 @@ export default function SubmitResource() {
           name: '',
           type: 'shelter',
           location: {
-            lat: 0,
-            lng: 0,
+            lat: '',
+            lng: '',
             address: '',
             city: '',
             country: ''
@@ -233,7 +233,7 @@ export default function SubmitResource() {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-light-bg/70">Location *</label>
-              <div className="relative h-48 bg-card-light/5 rounded-xl border border-light-bg/10 overflow-hidden group cursor-pointer">
+              <div className="relative h-72 bg-card-light/5 rounded-xl border border-light-bg/10 overflow-hidden group cursor-pointer">
                 <LocationPicker formData={formData} setFormData={setFormData} />
               </div>
             </div>

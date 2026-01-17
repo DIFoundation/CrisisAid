@@ -22,8 +22,8 @@ export type ResourceType = 'medical' | 'shelter' | 'food' | 'water' | 'power' | 
 export type ResourceStatus = 'available' | 'limited' | 'unavailable' | 'temporary_closed';
 
 export interface Location {
-  lat: number;
-  lng: number;
+  lat: string;
+  lng: string;
   address?: string;
   city?: string;
   country?: string;
