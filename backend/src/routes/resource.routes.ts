@@ -10,20 +10,54 @@ import {
 } from "../controllers/resource.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/role.middleware";
+import { validateBody, validateQuery } from "../middlewares/validate.middleware";
+import {
+  createResourceSchema,
+  updateResourceSchema,
+  resourceQuerySchema,
+  locationQuerySchema,
+} from "../supabase/validation";
 
 const router = Router();
 
 // Public routes
-router.get("/", fetchResources);
-router.get("/search", searchResourcesByLocation);
+router.get("/", validateQuery(resourceQuerySchema), fetchResources);
+router.get(
+  "/search",
+  validateQuery(locationQuerySchema),
+  searchResourcesByLocation
+);
 router.get("/:id", fetchResourceById);
 
 // Protected routes - authenticated users can create
-router.post("/", authenticate, addResource);
+router.post(
+  "/",
+  authenticate,
+  validateBody(createResourceSchema),
+  addResource
+);
 
 // Admin/Volunteer routes
-router.put("/:id", authenticate, authorize(["ADMIN", "VOLUNTEER"]), updateResource);
-router.patch("/:id/verify", authenticate, authorize(["ADMIN", "VOLUNTEER"]), verifyResource);
-router.delete("/:id", authenticate, authorize(["ADMIN"]), deleteResource);
+router.put(
+  "/:id",
+  authenticate,
+  authorize(["ADMIN", "VOLUNTEER"]),
+  validateBody(updateResourceSchema),
+  updateResource
+);
+
+router.patch(
+  "/:id/verify",
+  authenticate,
+  authorize(["ADMIN", "VOLUNTEER"]),
+  verifyResource
+);
+
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(["ADMIN"]),
+  deleteResource
+);
 
 export default router;
