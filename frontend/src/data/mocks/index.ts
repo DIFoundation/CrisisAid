@@ -37,8 +37,8 @@ export const mockResources: Resource[] = [
     name: 'Downtown Medical Center',
     type: 'medical',
     location: {
-      lat: 37.7749,
-      lng: -122.4194,
+      lat: '37.7749',
+      lng: '-122.4194',
       address: '123 Main St',
       city: 'San Francisco',
       country: 'USA',
@@ -60,8 +60,8 @@ export const mockResources: Resource[] = [
     name: 'Community Shelter',
     type: 'shelter',
     location: {
-      lat: 37.7849,
-      lng: -122.4094,
+      lat: '37.7849',
+      lng: '-122.4094',
       address: '456 Oak Ave',
       city: 'San Francisco',
       country: 'USA',
@@ -83,8 +83,8 @@ export const mockResources: Resource[] = [
     name: 'Water Distribution Point',
     type: 'water',
     location: {
-      lat: 37.7649,
-      lng: -122.4294,
+      lat: '37.7649',
+      lng: '-122.4294',
       address: '789 Pine St',
       city: 'San Francisco',
       country: 'USA',
@@ -104,8 +104,8 @@ export const mockResources: Resource[] = [
     name: 'Bandages',
     type: 'medical',
     location: { 
-      lat: 1.85,
-      lng: 1.225,
+      lat: '1.85',
+      lng: '1.225',
       address: 'Cedar City',
       city: 'UT 84720',
       country: 'USA',
@@ -130,8 +130,8 @@ export const mockAlerts: EmergencyAlert[] = [
     message: 'Heavy rainfall expected in the North Sector. Move to higher ground immediately.',
     severity: 'critical',
     location: {
-      lat: 37.8,
-      lng: -122.4,
+      lat: '37.8',
+      lng: '-122.4',
     },
     startTime: new Date().toISOString(),
     endTime: new Date(Date.now() + 24 * 3600000).toISOString(), // 24 hours from now
@@ -157,8 +157,8 @@ export const mockSubmissions: Submission[] = [
       name: 'Temporary Food Bank',
       type: 'food',
       location: {
-        lat: 37.7749,
-        lng: -122.4194,
+        lat: '37.7749',
+        lng: '-122.4194',
         address: '321 Market St',
         city: 'San Francisco',
         country: 'USA',
@@ -183,8 +183,8 @@ export const mockSubmissions: Submission[] = [
       name: 'Mobile Medical Unit',
       type: 'medical',
       location: {
-        lat: 37.7849,
-        lng: -122.4394,
+        lat: '37.7849',
+        lng: '-122.4394',
         address: '159 3rd St',
         city: 'San Francisco',
         country: 'USA',
