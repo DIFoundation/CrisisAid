@@ -6,6 +6,7 @@ import alertRoutes from "./routes/alert.routes";
 import submissionRoutes from "./routes/submission.routes";
 import userRoutes from "./routes/user.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
+import authRoutes from "./routes/auth.routes";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.get("/health", (req, res) => {
 });
 
 // API Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/submissions", submissionRoutes);

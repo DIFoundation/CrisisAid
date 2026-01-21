@@ -10,7 +10,7 @@ import {
 import { authenticate } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/role.middleware";
 import { validateBody } from "../middlewares/validate.middleware";
-import { createSubmissionSchema } from "../supabase/validation";
+import { createSubmissionSchema } from "../validation/schemas";
 
 const router = Router();
 

@@ -16,7 +16,7 @@ import {
   updateResourceSchema,
   resourceQuerySchema,
   locationQuerySchema,
-} from "../supabase/validation";
+} from "../validation/schemas";
 
 const router = Router();
 
