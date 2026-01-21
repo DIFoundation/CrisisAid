@@ -1,4 +1,3 @@
-// eslint-disable-file @typescript-eslint/no-unused-vars
 import express from "express";
 import cors from "cors";
 
