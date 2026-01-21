@@ -1,3 +1,4 @@
+// eslint-disable-file @typescript-eslint/no-unused-vars
 import { Request, Response } from "express";
 import * as ResourceService from "../services/resource.service";
 
