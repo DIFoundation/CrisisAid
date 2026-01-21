@@ -1,4 +1,3 @@
-// eslint-disable-file @typescript-eslint/no-unused-vars
 import swaggerJsdoc from 'swagger-jsdoc';
 import { version } from '../../package.json';
 
