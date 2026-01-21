@@ -42,7 +42,7 @@ const options: swaggerJsdoc.Options = {
         description: 'Development server'
       },
       {
-        url: 'https://api.crisisaid.com',
+        url: 'https://crisisaid-backend.onrender.com',
         description: 'Production server'
       }
     ],
