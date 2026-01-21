@@ -42,7 +42,7 @@ export const updateAlertSchema = createAlertSchema.partial();
 export const createSubmissionSchema = z.object({
   type: z.enum(["NEW_RESOURCE", "RESOURCE_UPDATE", "REPORT"]),
   resource_id: z.string().uuid().optional(),
-  data: z.record(z.any(), z.any()).optional(),
+  data: z.record(z.string(), z.any()),
 });
 
 // User Validation
@@ -69,4 +69,29 @@ export const locationQuerySchema = z.object({
   latitude: z.string().transform(val => parseFloat(val)).pipe(z.number().min(-90).max(90)),
   longitude: z.string().transform(val => parseFloat(val)).pipe(z.number().min(-180).max(180)),
   radius: z.string().transform(val => parseFloat(val)).pipe(z.number().positive().max(1000)).default(10),
+});
+
+// Auth Validation Schemas
+export const signUpSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(1, "Name is required").max(255),
+  role: z.enum(["ADMIN", "VOLUNTEER", "USER"]).optional(),
+});
+
+export const signInSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const updatePasswordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const refreshTokenSchema = z.object({
+  refresh_token: z.string().min(1, "Refresh token is required"),
 });

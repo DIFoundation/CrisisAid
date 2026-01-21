@@ -66,3 +66,13 @@ export const fetchUserStats = async (_: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const registerUser = async (req: Request, res: Response) => {
+  try {
+    const { error } = await UserService.createUser(req.body);
+    if (error) return res.status(400).json({ message: error.message });
+    res.json({ message: "User registered successfully" });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
