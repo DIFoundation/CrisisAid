@@ -1,4 +1,4 @@
-// FILE: src/controllers/auth.controller.ts
+// eslint-disable-file @typescript-eslint/no-unused-vars
 import { Request, Response } from "express";
 import { supabase } from "../config/supabase";
 

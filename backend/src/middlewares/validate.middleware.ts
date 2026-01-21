@@ -1,3 +1,4 @@
+// eslint-disable-file @typescript-eslint/no-unused-vars
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema, ZodError } from "zod";
 import { ParsedQs } from "qs";
