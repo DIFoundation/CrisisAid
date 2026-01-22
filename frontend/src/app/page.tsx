@@ -14,10 +14,10 @@ export default function LandingPage() {
           <span className="text-xl font-bold tracking-tight text-light-bg">CrisisAid</span>
         </div>
         <Link 
-          href="/login" 
+          href="/user" 
           className="text-sm font-medium text-primary hover:text-primary/80 transition-colors px-4 py-2 rounded-lg hover:bg-primary/10"
         >
-          Admin Login
+          Sign In
         </Link>
       </nav>
 
