@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   // Check authentication and redirect if not logged in
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/admin');
+      router.push('/user?redirect=/admin');
     }
   }, [isAuthenticated, authLoading, router]);
 
@@ -39,26 +39,13 @@ export default function AdminDashboard() {
       const loadSubmissions = async () => {
         try {
           setIsLoading(true);
-          await fetchSubmissions('pending');
-          // In a real app, we would use the actual API response
-          // For now, we'll use the mock data directly
-          const mockData = [
-            {
-              id: 'sub-1',
-              resource: {
-                name: 'Downtown Medical Center',
-                type: 'Medical',
-                location: {
-                  address: '123 Main St, San Francisco'
-                }
-              },
-              status: 'pending',
-              submittedAt: new Date(Date.now() - 300000).toISOString(), // 5m ago
-              submittedBy: 'user-3'
+          const data = await fetch('https://crisisaid-backend.onrender.com/api/submissions/pending', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
             },
-            // Add more mock submissions as needed
-          ];
-          setSubmissions(mockData);
+          }).then(res => res.json());
+          setSubmissions(data);
         } catch (err) {
           console.error('Failed to load submissions:', err);
           setError('Failed to load submissions. Please try again.');
@@ -69,12 +56,17 @@ export default function AdminDashboard() {
 
       loadSubmissions();
     }
-  }, [isAuthenticated, fetchSubmissions]);
+  }, [isAuthenticated]);
 
   const handleApprove = async (submissionId: string) => {
     try {
-      // In a real app, we would call an API to approve the submission
-      // await submissionService.approveSubmission(submissionId, user?.id || '');
+      const data = await fetch('https://crisisaid-backend.onrender.com/api/submissions/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: submissionId }),
+      });
       setSubmissions(prev => prev.filter(sub => sub.id !== submissionId));
     } catch (err) {
       console.error('Failed to approve submission:', err);
@@ -84,8 +76,13 @@ export default function AdminDashboard() {
 
   const handleReject = async (submissionId: string) => {
     try {
-      // In a real app, we would call an API to reject the submission
-      // await submissionService.rejectSubmission(submissionId, user?.id || '');
+      const data = await fetch('https://crisisaid-backend.onrender.com/api/submissions/reject', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: submissionId }),
+      });
       setSubmissions(prev => prev.filter(sub => sub.id !== submissionId));
     } catch (err) {
       console.error('Failed to reject submission:', err);
@@ -95,13 +92,13 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/user');
   };
 
   const filteredSubmissions = submissions.filter(submission =>
     submission.resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     submission.resource.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    submission.resource.location.address.toLowerCase().includes(searchQuery.toLowerCase())
+    submission.resource.location?.address?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const formatTimeAgo = (dateString: string) => {

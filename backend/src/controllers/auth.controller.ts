@@ -63,7 +63,15 @@ export const signIn = async (req: Request, res: Response) => {
 
     res.json({
       message: "Login successful",
-      user: userProfile,
+      user: {
+        name: userProfile.name,
+        role: userProfile.role,
+        verified: userProfile.verified,
+        organization: userProfile.organization,
+        phone: userProfile.phone,
+        email: userProfile.email,
+        id: userProfile.id,
+      },
       session: {
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
