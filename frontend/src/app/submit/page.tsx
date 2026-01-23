@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, CheckCircle2, Info, Send, AlertCircle, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useAppContext } from '@/data/context/AppContext';
-import { Resource, ResourceType, ResourceStatus } from '@/data/types';
+import { Resource, ResourceType, ResourceStatus } from '@/types';
 import LocationPicker from '@/components/LocationPicker';
 
 export default function SubmitResource() {

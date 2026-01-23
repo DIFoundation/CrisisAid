@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Resource } from '@/data/types';
+import { Resource } from '@/types';
 
 // Fix for default marker icons in Next.js
 // @ts-ignore

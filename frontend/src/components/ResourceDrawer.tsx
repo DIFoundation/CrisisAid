@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, MapPin, Clock, Phone, Globe, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail } from 'lucide-react';
-import { Resource } from '@/data/types';
+import { Resource } from '@/types';
 import { useAppContext } from '@/data/context/AppContext';
 
 type ResourceDrawerProps = {

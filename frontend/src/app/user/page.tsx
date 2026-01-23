@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/data/context/AppContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 export default function AdminLogin() {
   const [name, setName] = useState("");
@@ -33,10 +33,17 @@ export default function AdminLogin() {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const success = await fetch("https://crisisaid-backend.onrender.com/api/auth/signin", {
+      const response = await fetch("https://crisisaid-backend.onrender.com/api/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,15 +51,33 @@ export default function AdminLogin() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (success) {
-        // Redirect to admin dashboard on successful login
-        router.push("/admin");
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store auth token
+        localStorage.setItem('authToken', data.session.access_token);
+        
+        // Store user data
+        localStorage.setItem('userData', JSON.stringify(data.data.user));
+        
+        // console.log('data: ', data);
+        toast.success(`Welcome back, ${data.data.user.name}!`);
+        
+        // Redirect based on role
+        if (data.data.user.role === 'ADMIN' || data.data.user.role === 'VOLUNTEER') {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       } else {
-        setError("Invalid email or password");
+        // Handle specific error messages from backend
+        setError(data.data.message || data.error || "Invalid email or password");
+        toast.error(data.data.message || "Login failed");
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError("An error occurred during login. Please try again.");
+      setError("Unable to connect to the server. Please try again later.");
+      toast.error("Connection error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -62,32 +87,74 @@ export default function AdminLogin() {
     e.preventDefault();
     setError("");
 
-    // Basic validation
-    if (!email || !password) {
-      setError("Please enter both email and password");
+    // Validation
+    if (!name || !email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    // Name validation
+    if (name.trim().length < 2) {
+      setError("Name must be at least 2 characters long");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const success = await fetch("https://crisisaid-backend.onrender.com/api/auth/signup", {
+      const response = await fetch("https://crisisaid-backend.onrender.com/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({name, email, password})
+        body: JSON.stringify({ 
+          name: name.trim(), 
+          email: email.trim().toLowerCase(), 
+          password,
+          role: "USER" // Default role, can be changed by admin later
+        })
       });
 
-      if (success) {
-        // Redirect to admin dashboard on successful login
-        router.push("/admin");
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Account created successfully! Please sign in.");
+        
+        // Clear form
+        setName("");
+        setEmail("");
+        setPassword("");
+        
+        // Switch to login tab
+        const loginTab = document.querySelector('[value="login"]') as HTMLButtonElement;
+        if (loginTab) loginTab.click();
+        
       } else {
-        setError("Invalid email or password");
+        // Handle specific error messages from backend
+        if (data.message && data.message.includes("already exists")) {
+          setError("An account with this email already exists");
+        } else {
+          setError(data.message || data.error || "Registration failed. Please try again.");
+        }
+        toast.error(data.message || "Registration failed");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setError("An error occurred during login. Please try again.");
+      console.error("Registration error:", err);
+      setError("Unable to connect to the server. Please try again later.");
+      toast.error("Connection error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -110,18 +177,30 @@ export default function AdminLogin() {
         </p>
       </div>
 
-      {/* Login Card */}
-      <Tabs defaultValue="login" className="w-[400px]">
-        <TabsList className="w-full h-10">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="register">Register</TabsTrigger>
+      {/* Login/Register Card */}
+      <Tabs defaultValue="login" className="w-full max-w-md">
+        <TabsList className="w-full h-12 mb-6 grid grid-cols-2 bg-card-dark border border-light-bg/10">
+          <TabsTrigger 
+            value="login"
+            className="data-[state=active]:bg-primary data-[state=active]:text-white"
+          >
+            Login
+          </TabsTrigger>
+          <TabsTrigger 
+            value="register"
+            className="data-[state=active]:bg-primary data-[state=active]:text-white"
+          >
+            Register
+          </TabsTrigger>
         </TabsList>
+
+        {/* Login Tab */}
         <TabsContent value="login">
-          <div className="w-full max-w-md bg-card-dark border border-light-bg/10 rounded-3xl p-8 shadow-2xl">
+          <div className="w-full bg-card-dark border border-light-bg/10 rounded-3xl p-8 shadow-2xl">
             <div className="flex items-center gap-3 mb-8 pb-4 border-b border-light-bg/10">
-              <ShieldAlert className="text-warning" size={24} />
+              <ShieldAlert className="text-primary" size={24} />
               <h2 className="text-xl font-bold text-light-bg">
-                Login to access your account
+                Login to Your Account
               </h2>
             </div>
 
@@ -139,10 +218,10 @@ export default function AdminLogin() {
               {/* Email Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="email"
+                  htmlFor="login-email"
                   className="text-sm font-semibold text-light-bg/80 ml-1"
                 >
-                  Email
+                  Email Address
                 </label>
                 <div className="relative">
                   <Mail
@@ -150,10 +229,13 @@ export default function AdminLogin() {
                     size={20}
                   />
                   <input
-                    id="email"
+                    id="login-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError("");
+                    }}
                     placeholder="admin@crisisaid.org"
                     className="w-full bg-card-light/5 border border-light-bg/10 rounded-xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all text-light-bg placeholder-light-bg/40"
                     disabled={isLoading}
@@ -165,7 +247,7 @@ export default function AdminLogin() {
               {/* Password Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="password"
+                  htmlFor="login-password"
                   className="text-sm font-semibold text-light-bg/80 ml-1"
                 >
                   Password
@@ -176,10 +258,13 @@ export default function AdminLogin() {
                     size={20}
                   />
                   <input
-                    id="password"
+                    id="login-password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError("");
+                    }}
                     placeholder="••••••••"
                     className="w-full bg-card-light/5 border border-light-bg/10 rounded-xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all text-light-bg placeholder-light-bg/40"
                     disabled={isLoading}
@@ -195,13 +280,13 @@ export default function AdminLogin() {
                 className={`w-full py-4 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group ${
                   isLoading
                     ? "bg-primary/70 cursor-not-allowed"
-                    : "bg-primary hover:bg-primary/90"
+                    : "bg-primary hover:bg-primary/90 hover:shadow-xl"
                 }`}
               >
                 {isLoading ? (
                   <>
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                      className="animate-spin h-5 w-5 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -237,8 +322,7 @@ export default function AdminLogin() {
             <div className="mt-8 text-center">
               <Link
                 href="/"
-                className="text-sm text-light-bg/60 hover:text-light-bg transition-colors"
-                aria-disabled={isLoading}
+                className="text-sm text-light-bg/60 hover:text-primary transition-colors inline-flex items-center gap-1"
               >
                 ← Return to Public Home
               </Link>
@@ -246,12 +330,13 @@ export default function AdminLogin() {
           </div>
         </TabsContent>
 
+        {/* Register Tab */}
         <TabsContent value="register">
-          <div className="w-full max-w-md bg-card-dark border border-light-bg/10 rounded-3xl p-8 shadow-2xl">
+          <div className="w-full bg-card-dark border border-light-bg/10 rounded-3xl p-8 shadow-2xl">
             <div className="flex items-center gap-3 mb-8 pb-4 border-b border-light-bg/10">
-              <ShieldAlert className="text-warning" size={24} />
+              <ShieldAlert className="text-success" size={24} />
               <h2 className="text-xl font-bold text-light-bg">
-                Register to create an account
+                Create Your Account
               </h2>
             </div>
 
@@ -269,10 +354,10 @@ export default function AdminLogin() {
               {/* Name Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="email"
+                  htmlFor="register-name"
                   className="text-sm font-semibold text-light-bg/80 ml-1"
                 >
-                  Name
+                  Full Name
                 </label>
                 <div className="relative">
                   <User
@@ -280,14 +365,18 @@ export default function AdminLogin() {
                     size={20}
                   />
                   <input
-                    id="name"
+                    id="register-name"
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setError("");
+                    }}
                     placeholder="John Doe"
                     className="w-full bg-card-light/5 border border-light-bg/10 rounded-xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all text-light-bg placeholder-light-bg/40"
                     disabled={isLoading}
                     required
+                    minLength={2}
                   />
                 </div>
               </div>
@@ -295,10 +384,10 @@ export default function AdminLogin() {
               {/* Email Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="email"
+                  htmlFor="register-email"
                   className="text-sm font-semibold text-light-bg/80 ml-1"
                 >
-                  Email
+                  Email Address
                 </label>
                 <div className="relative">
                   <Mail
@@ -306,10 +395,13 @@ export default function AdminLogin() {
                     size={20}
                   />
                   <input
-                    id="email"
+                    id="register-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError("");
+                    }}
                     placeholder="admin@crisisaid.org"
                     className="w-full bg-card-light/5 border border-light-bg/10 rounded-xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all text-light-bg placeholder-light-bg/40"
                     disabled={isLoading}
@@ -321,7 +413,7 @@ export default function AdminLogin() {
               {/* Password Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="password"
+                  htmlFor="register-password"
                   className="text-sm font-semibold text-light-bg/80 ml-1"
                 >
                   Password
@@ -332,16 +424,23 @@ export default function AdminLogin() {
                     size={20}
                   />
                   <input
-                    id="password"
+                    id="register-password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError("");
+                    }}
                     placeholder="••••••••"
                     className="w-full bg-card-light/5 border border-light-bg/10 rounded-xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all text-light-bg placeholder-light-bg/40"
                     disabled={isLoading}
                     required
+                    minLength={6}
                   />
                 </div>
+                <p className="text-xs text-light-bg/50 ml-1">
+                  Must be at least 6 characters long
+                </p>
               </div>
 
               {/* Submit Button */}
@@ -350,14 +449,14 @@ export default function AdminLogin() {
                 disabled={isLoading}
                 className={`w-full py-4 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group ${
                   isLoading
-                    ? "bg-primary/70 cursor-not-allowed"
-                    : "bg-primary hover:bg-primary/90"
+                    ? "bg-success/70 cursor-not-allowed"
+                    : "bg-success hover:bg-success/90 hover:shadow-xl"
                 }`}
               >
                 {isLoading ? (
                   <>
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                      className="animate-spin h-5 w-5 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -376,11 +475,11 @@ export default function AdminLogin() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Signing In...
+                    Creating Account...
                   </>
                 ) : (
                   <>
-                    Sign In to Dashboard
+                    Create Account
                     <ArrowRight
                       size={18}
                       className="group-hover:translate-x-1 transition-transform"
@@ -393,8 +492,7 @@ export default function AdminLogin() {
             <div className="mt-8 text-center">
               <Link
                 href="/"
-                className="text-sm text-light-bg/60 hover:text-light-bg transition-colors"
-                aria-disabled={isLoading}
+                className="text-sm text-light-bg/60 hover:text-primary transition-colors inline-flex items-center gap-1"
               >
                 ← Return to Public Home
               </Link>
@@ -406,7 +504,7 @@ export default function AdminLogin() {
       {/* Security Footer */}
       <p className="mt-12 text-xs text-light-bg/40 max-w-xs text-center leading-relaxed">
         Access to this system is logged. Unauthorized attempts will be reported.
-        Encryption: AES-256-GCM.
+        All data is encrypted with AES-256-GCM.
       </p>
     </div>
   );
