@@ -13,7 +13,7 @@ import {
   Utensils,
   ChevronDown,
 } from "lucide-react";
-import { Resource } from "@/data/types";
+import { Resource } from "@/types";
 
 interface ResourceTypeOption {
   id: string;

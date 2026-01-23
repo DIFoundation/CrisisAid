@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, Info, AlertCircle, Bell } from 'lucide-react';
-import useCriticalAlerts from '../hooks/useCriticalAlerts';
 
 const getAlertIcon = (severity: string) => {
   switch (severity) {
@@ -33,7 +32,7 @@ const getAlertColor = (severity: string) => {
 };
 
 export default function CriticalAlert() {
-  const { alerts, dismissAlert } = useCriticalAlerts();
+  // const { alerts, dismissAlert } = useCriticalAlerts();
   const [visibleAlert, setVisibleAlert] = React.useState<typeof alerts[number] | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
 

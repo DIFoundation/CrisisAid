@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner"
 // import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-import { AppProvider } from "@/data/context/AppContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,11 +29,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
       >
-        <AppProvider>
           <div className="min-h-screen flex flex-col">
             {children}
           </div>
-        </AppProvider>
+          <Toaster />
       </body>
     </html>
   );
