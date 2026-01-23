@@ -23,13 +23,13 @@ export const validateBody = (schema: ZodSchema) => {
   };
 };
 
-export const validateQuery = <T extends Record<string, any>>(
+export const validateQuery = <T>(
   schema: ZodSchema<T>
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const parsed = schema.parse(req.query);
-      req.query = parsed as unknown as ParsedQs;
+      (req as any).validatedQuery = parsed;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
