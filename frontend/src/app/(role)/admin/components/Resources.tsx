@@ -1,71 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format } from 'date-fns';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { format } from "date-fns";
+import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
 
 // Types
-type ResourceType = 'FOOD' | 'WATER' | 'SHELTER' | 'MEDICAL' | 'CLOTHING' | 'OTHER';
-type ResourceStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'UNAVAILABLE';
+type ResourceType =
+  | "FOOD"
+  | "WATER"
+  | "SHELTER"
+  | "MEDICAL"
+  | "CLOTHING"
+  | "OTHER";
+type ResourceStatus =
+  | "AVAILABLE"
+  | "LIMITED"
+  | "TEMPORARILY_CLOSED"
+  | "UNAVAILABLE";
 
 type Resource = {
   id: string;
   name: string;
-  description: string;
   type: ResourceType;
   status: ResourceStatus;
-  quantity: number;
-  location: string;
-  createdAt: string;
-  updatedAt: string;
-  lastChecked: string;
-  notes?: string;
+  description: string;
+  capacity: number;
+  current_occupancy: number;
+  latitude: number;
+  longitude: number;
+  address: string;
+  city: string;
+  country: string;
+  phone: string;
+  email: string;
+  operating_hours: string;
+  notes: string;
 };
 
-type FilterType = 'all' | ResourceType;
+type FilterType = "all" | ResourceType;
 
 export default function Resources() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FilterType>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filter, setFilter] = useState<FilterType>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [currentResource, setCurrentResource] = useState<Partial<Resource> | null>(null);
+  const [currentResource, setCurrentResource] =
+    useState<Partial<Resource> | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [resourceToDelete, setResourceToDelete] = useState<string | null>(null);
-  
+
   const itemsPerPage = 10;
 
-  // Resource types for dropdown
-  const resourceTypes: ResourceType[] = ['FOOD', 'WATER', 'SHELTER', 'MEDICAL', 'CLOTHING', 'OTHER'];
-  const resourceStatuses: ResourceStatus[] = ['AVAILABLE', 'IN_USE', 'MAINTENANCE', 'UNAVAILABLE'];
+  // Resource types for dropdown with user-friendly display names
+  const resourceTypes = [
+    { value: "FOOD", label: "Food & Meals" },
+    { value: "WATER", label: "Drinking Water" },
+    { value: "SHELTER", label: "Emergency Shelter" },
+    { value: "MEDICAL", label: "Medical Supplies" },
+    { value: "CLOTHING", label: "Clothing" },
+    { value: "OTHER", label: "Other Resources" },
+  ] as const;
+
+  const resourceStatuses: ResourceStatus[] = [
+    "AVAILABLE",
+    "LIMITED",
+    "TEMPORARILY_CLOSED",
+    "UNAVAILABLE",
+  ];
 
   // Fetch resources
   useEffect(() => {
     const fetchResources = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('authToken');
-        const response = await fetch('https://crisisaid-backend.onrender.com/api/resources', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(
+          "https://crisisaid-backend.onrender.com/api/resources",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch resources');
+          throw new Error("Failed to fetch resources");
         }
 
         const data = await response.json();
         setResources(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching resources:', err);
+        setError(err instanceof Error ? err.message : "An error occurred");
+        console.error("Error fetching resources:", err);
       } finally {
         setLoading(false);
       }
@@ -75,12 +120,13 @@ export default function Resources() {
   }, []); // Empty dependency array means this runs once on mount
 
   // Filter resources
-  const filteredResources = resources.filter(resource => {
-    const matchesFilter = filter === 'all' || resource.type === filter;
-    const matchesSearch = 
-      resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredResources = resources.filter((resource) => {
+    const matchesFilter = filter === "all" || resource.type === filter;
+    const matchesSearch =
+      resource.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.location.toLowerCase().includes(searchQuery.toLowerCase());
+      resource.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.status.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -94,13 +140,21 @@ export default function Resources() {
   // Handle CRUD operations
   const handleCreateNew = () => {
     setCurrentResource({
-      name: '',
-      description: '',
-      type: 'FOOD',
-      status: 'AVAILABLE',
-      quantity: 1,
-      location: '',
-      notes: ''
+      name: "",
+      description: "",
+      type: "FOOD",
+      status: "AVAILABLE",
+      capacity: 1,
+      current_occupancy: 0,
+      latitude: 0,
+      longitude: 0,
+      address: "",
+      city: "",
+      country: "",
+      phone: "",
+      email: "",
+      operating_hours: "",
+      notes: "",
     });
     setIsDialogOpen(true);
   };
@@ -117,26 +171,29 @@ export default function Resources() {
 
   const confirmDelete = async () => {
     if (!resourceToDelete) return;
-    
+
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`https://crisisaid-backend.onrender.com/api/resources/${resourceToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(
+        `https://crisisaid-backend.onrender.com/api/resources/${resourceToDelete}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to delete resource');
+        throw new Error("Failed to delete resource");
       }
 
       // Update local state
-      setResources(resources.filter(r => r.id !== resourceToDelete));
+      setResources(resources.filter((r) => r.id !== resourceToDelete));
       setIsDeleteDialogOpen(false);
       setResourceToDelete(null);
     } catch (err) {
-      console.error('Error deleting resource:', err);
+      console.error("Error deleting resource:", err);
       // Show error toast or message
     }
   };
@@ -146,32 +203,32 @@ export default function Resources() {
     if (!currentResource) return;
 
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("authToken");
       const isUpdate = !!currentResource.id;
-      const url = isUpdate 
+      const url = isUpdate
         ? `https://crisisaid-backend.onrender.com/api/resources/${currentResource.id}`
-        : 'https://crisisaid-backend.onrender.com/api/resources';
-      
-      const method = isUpdate ? 'PUT' : 'POST';
+        : "https://crisisaid-backend.onrender.com/api/resources";
+
+      const method = isUpdate ? "PUT" : "POST";
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(currentResource),
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${isUpdate ? 'update' : 'create'} resource`);
+        throw new Error(`Failed to ${isUpdate ? "update" : "create"} resource`);
       }
 
       const data = await response.json();
-      
+
       // Update local state
       if (isUpdate) {
-        setResources(resources.map(r => r.id === data.id ? data : r));
+        setResources(resources.map((r) => (r.id === data.id ? data : r)));
       } else {
         setResources([...resources, data]);
       }
@@ -179,7 +236,7 @@ export default function Resources() {
       setIsDialogOpen(false);
       setCurrentResource(null);
     } catch (err) {
-      console.error('Error saving resource:', err);
+      console.error("Error saving resource:", err);
       // Show error toast or message
     }
   };
@@ -187,24 +244,36 @@ export default function Resources() {
   // Status badge color mapping
   const getStatusBadgeVariant = (status: ResourceStatus) => {
     switch (status) {
-      case 'AVAILABLE': return 'default';
-      case 'IN_USE': return 'secondary';
-      case 'MAINTENANCE': return 'warning';
-      case 'UNAVAILABLE': return 'destructive';
-      default: return 'outline';
+      case "AVAILABLE":
+        return "default";
+      case "LIMITED":
+        return "secondary";
+      case "TEMPORARILY_CLOSED":
+        return "warning";
+      case "UNAVAILABLE":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
   // Type badge color mapping
   const getTypeBadgeVariant = (type: ResourceType) => {
     switch (type) {
-      case 'FOOD': return 'default';
-      case 'WATER': return 'secondary';
-      case 'SHELTER': return 'warning';
-      case 'MEDICAL': return 'destructive';
-      case 'CLOTHING': return 'outline';
-      case 'OTHER': return 'outline';
-      default: return 'outline';
+      case "FOOD":
+        return "default";
+      case "WATER":
+        return "secondary";
+      case "SHELTER":
+        return "warning";
+      case "MEDICAL":
+        return "destructive";
+      case "CLOTHING":
+        return "outline";
+      case "OTHER":
+        return "outline";
+      default:
+        return "outline";
     }
   };
 
@@ -238,15 +307,18 @@ export default function Resources() {
               className="pl-10 w-full"
             />
           </div>
-          <Select value={filter} onValueChange={(value: FilterType) => setFilter(value)}>
+          <Select
+            value={filter}
+            onValueChange={(value: FilterType) => setFilter(value)}
+          >
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {resourceTypes.map(type => (
-                <SelectItem key={type} value={type}>
-                  {type.charAt(0) + type.slice(1).toLowerCase()}
+              {resourceTypes.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -284,34 +356,43 @@ export default function Resources() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={getTypeBadgeVariant(resource.type)}>
-                      {resource.type.charAt(0) + resource.type.slice(1).toLowerCase()}
+                      {resourceTypes.find((t) => t.value === resource.type)
+                        ?.label || resource.type}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadgeVariant(resource.status)}>
-                      {resource.status.split('_').map(word => 
-                        word.charAt(0) + word.slice(1).toLowerCase()
-                      ).join(' ')}
+                      {resource.status
+                        .split("_")
+                        .map(
+                          (word) => word.charAt(0) + word.slice(1).toLowerCase()
+                        )
+                        .join(" ")}
                     </Badge>
                   </TableCell>
-                  <TableCell>{resource.quantity}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{resource.location}</TableCell>
+                  <TableCell>{resource.capacity}</TableCell>
+                  <TableCell className="max-w-[200px] truncate">
+                    {resource.address}
+                  </TableCell>
                   <TableCell>
-                    {resource.lastChecked 
-                      ? format(new Date(resource.lastChecked), 'MMM d, yyyy')
-                      : 'N/A'}
+                    {/* {resource.operating_hours
+                      ? format(
+                          new Date(resource.operating_hours),
+                          "MMM d, yyyy"
+                        )
+                      : "N/A"} */}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => handleEdit(resource)}
                     >
                       <Pencil className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
                     </Button>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       className="text-destructive hover:text-destructive"
                       onClick={() => handleDeleteClick(resource.id)}
@@ -324,9 +405,12 @@ export default function Resources() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  {searchQuery || filter !== 'all' 
-                    ? 'No resources match your search criteria.' 
+                <TableCell
+                  colSpan={7}
+                  className="text-center py-8 text-muted-foreground"
+                >
+                  {searchQuery || filter !== "all"
+                    ? "No resources match your search criteria."
                     : 'No resources found. Click "Add Resource" to get started.'}
                 </TableCell>
               </TableRow>
@@ -338,20 +422,20 @@ export default function Resources() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-between items-center">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           >
             Previous
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </span>
-          <Button 
+          <Button
             variant="outline"
             disabled={currentPage >= totalPages}
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           >
             Next
           </Button>
@@ -363,33 +447,38 @@ export default function Resources() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-semibold mb-4">
-              {currentResource.id ? 'Edit Resource' : 'Add New Resource'}
+              {currentResource.id ? "Edit Resource" : "Add New Resource"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Name *</label>
                   <Input
-                    value={currentResource.name || ''}
-                    onChange={(e) => setCurrentResource({...currentResource, name: e.target.value})}
+                    value={currentResource.name || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        name: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Type *</label>
                   <Select
-                    value={currentResource.type || 'FOOD'}
-                    onValueChange={(value: ResourceType) => 
-                      setCurrentResource({...currentResource, type: value})
+                    value={currentResource.type || "FOOD"}
+                    onValueChange={(value: ResourceType) =>
+                      setCurrentResource({ ...currentResource, type: value })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {resourceTypes.map(type => (
-                        <SelectItem key={type} value={type}>
-                          {type.charAt(0) + type.slice(1).toLowerCase()}
+                      {resourceTypes.map(({ value, label }) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -398,20 +487,24 @@ export default function Resources() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Status *</label>
                   <Select
-                    value={currentResource.status || 'AVAILABLE'}
-                    onValueChange={(value: ResourceStatus) => 
-                      setCurrentResource({...currentResource, status: value})
+                    value={currentResource.status || "AVAILABLE"}
+                    onValueChange={(value: ResourceStatus) =>
+                      setCurrentResource({ ...currentResource, status: value })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      {resourceStatuses.map(status => (
+                      {resourceStatuses.map((status) => (
                         <SelectItem key={status} value={status}>
-                          {status.split('_').map(word => 
-                            word.charAt(0) + word.slice(1).toLowerCase()
-                          ).join(' ')}
+                          {status
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0) + word.slice(1).toLowerCase()
+                            )
+                            .join(" ")}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -422,28 +515,147 @@ export default function Resources() {
                   <Input
                     type="number"
                     min="0"
-                    value={currentResource.quantity || 1}
-                    onChange={(e) => setCurrentResource({
-                      ...currentResource, 
-                      quantity: parseInt(e.target.value) || 0
-                    })}
+                    value={currentResource.capacity || 1}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        capacity: parseInt(e.target.value) || 0,
+                      })
+                    }
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Current Occupancy
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={currentResource.current_occupancy || 0}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        current_occupancy: parseInt(e.target.value) || 0,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Latitude</label>
+                  <Input
+                    type="number"
+                    step="any"
+                    value={currentResource.latitude || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        latitude: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Longitude</label>
+                  <Input
+                    type="number"
+                    step="any"
+                    value={currentResource.longitude || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        longitude: parseFloat(e.target.value) || 0,
+                      })
+                    }
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-medium">Location *</label>
                   <Input
-                    value={currentResource.location || ''}
-                    onChange={(e) => setCurrentResource({...currentResource, location: e.target.value})}
+                    value={currentResource.address || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        address: e.target.value,
+                      })
+                    }
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">City</label>
+                  <Input
+                    value={currentResource.city || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        city: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Country</label>
+                  <Input
+                    value={currentResource.country || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        country: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Phone</label>
+                  <Input
+                    type="tel"
+                    value={currentResource.phone || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        phone: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Email</label>
+                  <Input
+                    type="email"
+                    value={currentResource.email || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        email: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Operating Hours</label>
+                  <Input
+                    placeholder="e.g., Mon-Fri 9am-5pm"
+                    value={currentResource.operating_hours || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        operating_hours: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-medium">Description</label>
                   <textarea
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={currentResource.description || ''}
-                    onChange={(e) => setCurrentResource({...currentResource, description: e.target.value})}
+                    value={currentResource.description || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        description: e.target.value,
+                      })
+                    }
                     rows={3}
                   />
                 </div>
@@ -451,8 +663,13 @@ export default function Resources() {
                   <label className="text-sm font-medium">Notes</label>
                   <textarea
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={currentResource.notes || ''}
-                    onChange={(e) => setCurrentResource({...currentResource, notes: e.target.value})}
+                    value={currentResource.notes || ""}
+                    onChange={(e) =>
+                      setCurrentResource({
+                        ...currentResource,
+                        notes: e.target.value,
+                      })
+                    }
                     rows={2}
                   />
                 </div>
@@ -469,7 +686,14 @@ export default function Resources() {
                   Cancel
                 </Button>
                 <Button type="submit">
-                  {currentResource.id ? 'Update' : 'Create'} Resource
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : currentResource.id ? (
+                    "Update"
+                  ) : (
+                    "Create"
+                  )}{" "}
+                  Resource
                 </Button>
               </div>
             </form>
@@ -483,7 +707,8 @@ export default function Resources() {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-2">Delete Resource</h3>
             <p className="text-muted-foreground mb-6">
-              Are you sure you want to delete this resource? This action cannot be undone.
+              Are you sure you want to delete this resource? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end space-x-2">
               <Button
@@ -495,10 +720,7 @@ export default function Resources() {
               >
                 Cancel
               </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDelete}
-              >
+              <Button variant="destructive" onClick={confirmDelete}>
                 Delete
               </Button>
             </div>

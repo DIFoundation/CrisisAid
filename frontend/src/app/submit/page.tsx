@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, CheckCircle2, Info, Send, AlertCircle, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
-import { useAppContext } from '@/data/context/AppContext';
+// import { useAppContext } from '@/data/context/AppContext';
 import { Resource, ResourceType, ResourceStatus } from '@/types';
 import LocationPicker from '@/components/LocationPicker';
 
 export default function SubmitResource() {
   const router = useRouter();
-  const { submitResource } = useAppContext();
+  // const { submitResource } = useAppContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -87,32 +87,32 @@ export default function SubmitResource() {
       }
 
       // Submit the resource
-      const success = await submitResource(formData);
+      // const success = await submitResource(formData);
       
-      if (success) {
-        setSubmitted(true);
-        // Reset form after successful submission
-        setFormData({
-          name: '',
-          type: 'shelter',
-          location: {
-            lat: '',
-            lng: '',
-            address: '',
-            city: '',
-            country: ''
-          },
-          status: 'available',
-          description: '',
-          contactInfo: {
-            phone: '',
-            email: ''
-          },
-          capacity: 0,
-          currentOccupancy: 0,
-          notes: ''
-        });
-      }
+      // if (success) {
+      //   setSubmitted(true);
+      //   // Reset form after successful submission
+      //   setFormData({
+      //     name: '',
+      //     type: 'shelter',
+      //     location: {
+      //       lat: '',
+      //       lng: '',
+      //       address: '',
+      //       city: '',
+      //       country: ''
+      //     },
+      //     status: 'available',
+      //     description: '',
+      //     contactInfo: {
+      //       phone: '',
+      //       email: ''
+      //     },
+      //     capacity: 0,
+      //     currentOccupancy: 0,
+      //     notes: ''
+      //   });
+      // }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while submitting the resource');
       console.error('Submission error:', err);
