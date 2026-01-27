@@ -3,11 +3,10 @@ import * as ResourceService from "../services/resource.service";
 
 export const fetchResources = async (req: Request, res: Response) => {
   try {
-    const { type, status, verified, limit, offset } = req.query;
+    const { type, status, limit, offset } = req.query;
     const filters = {
       type: type as string,
       status: status as string,
-      verified: verified === "true",
       limit: limit ? parseInt(limit as string) : undefined,
       offset: offset ? parseInt(offset as string) : undefined,
     };

@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Gem, Send, TriangleAlert, Users } from 'lucide-react';
 import Cookies from 'js-cookie';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface Stats {
     alerts: {
@@ -36,6 +38,7 @@ interface Stats {
 }
 
 export default function Dashboard() {
+  const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -169,7 +172,10 @@ export default function Dashboard() {
                 // console.log('response: ', response)
 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch stats');
+                    // throw new Error('Failed to fetch stats');
+                    toast.error('Unauthorized, please login');
+                    router.push('/user');
+                    return;
                 }
 
                 const data = await response.json();

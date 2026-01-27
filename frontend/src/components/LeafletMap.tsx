@@ -56,12 +56,12 @@ const MapController = ({
 
   useEffect(() => {
     if (selectedResource && selectedResource.latitude) {
-      const { lat, lng } = selectedResource.latitude && selectedResource.longitude;
-      map.flyTo([lat, lng], 15, { duration: 1 });
+      const { latitude, longitude } = selectedResource;
+      map.flyTo([latitude, longitude], 15, { duration: 1 });
     } else if (!initialViewSet && resources?.length > 0) {
       // Set initial view to fit all markers with some padding
       const bounds = L.latLngBounds(
-        resources.map((r) => [r.location.lat, r.location.lng])
+        resources.map((r) => [r.latitude, r.longitude])
       );
       map.fitBounds(bounds.pad(0.1));
       setInitialViewSet(true);
@@ -128,12 +128,12 @@ const LeafletMap = ({
         {/* Resource Markers */}
         {resources?.map((resource) => {
           const isSelected = selectedResource?.id === resource.id;
-          const { lat, lng } = resource.location;
+          const { latitude, longitude } = resource;
           
           return (
             <Marker
               key={resource.id}
-              position={[lat, lng]}
+              position={[latitude, longitude]}
               icon={createCustomIcon(resource.status)}
               eventHandlers={{
                 click: () => onResourceSelect(resource),
@@ -150,10 +150,16 @@ const LeafletMap = ({
                   <p className="text-foreground/70">
                     {resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}
                   </p>
-                  {resource.status === 'limited' && (
+                  {resource.status === 'AVAILABLE' && (
+                    <p className="text-green-500 text-xs mt-1">Available</p>
+                  )}
+                  {resource.status === 'LIMITED' && (
                     <p className="text-amber-500 text-xs mt-1">Limited availability</p>
                   )}
-                  {resource.status === 'unavailable' && (
+                  {resource.status === 'TEMPORARY_CLOSED' && (
+                    <p className="text-red-400 text-xs mt-1">Temporary closed</p>
+                  )}
+                  {resource.status === 'UNAVAILABLE' && (
                     <p className="text-red-500 text-xs mt-1">Currently unavailable</p>
                   )}
                 </div>
@@ -162,7 +168,7 @@ const LeafletMap = ({
               {/* Highlight circle for selected marker */}
               {isSelected && (
                 <Circle
-                  center={[lat, lng]}
+                  center={[latitude, longitude]}
                   radius={50}
                   pathOptions={{
                     fillColor: '#3B82F6',

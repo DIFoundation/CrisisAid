@@ -42,7 +42,7 @@ export default function Submissions() {
       try {
         setLoading(true);
         const token = Cookies.get('authToken');
-        const response = await fetch('https://crisisaid-backend.onrender.com/api/submissions', {
+        const response = await fetch('https://crisisaid-backend.onrender.com/api/submissions/pending', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
