@@ -1,7 +1,6 @@
 import React from 'react';
-import { X, MapPin, Clock, Phone, Globe, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail } from 'lucide-react';
+import { X, MapPin, Clock, Phone, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail } from 'lucide-react';
 import { Resource } from '@/types';
-import { useAppContext } from '@/data/context/AppContext';
 
 type ResourceDrawerProps = {
   isOpen: boolean;
@@ -10,12 +9,11 @@ type ResourceDrawerProps = {
 };
 
 const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resource }) => {
-  const { user, isAuthenticated } = useAppContext();
 
   if (!isOpen || !resource) return null;
 
   const getStatusBadge = () => {
-    if (resource.verified) {
+    if (resource.verified === true) {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-success/20 text-success">
           <CheckCircle className="w-3 h-3 mr-1" /> Verified
@@ -30,67 +28,32 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
   };
 
   const getContactInfo = () => {
-    if (!resource.location) return null;
+    if (!resource.phone) return null;
     
     return (
       <div className="mt-4 space-y-2">
         <h4 className="text-sm font-bold text-foreground/80">Contact Information</h4>
-        {resource.contactInfo && (
+        {resource.phone && (
           <div className="flex items-center text-sm text-foreground/70">
             <Phone className="w-4 h-4 mr-2 text-primary" />
-            <a href={`tel:${resource.contactInfo.phone}`} className="hover:underline">
-              {resource.contactInfo.phone}
+            <a href={`tel:${resource.phone}`} className="hover:underline">
+              {resource.phone}
             </a>
           </div>
         )}
-        {resource.contactInfo && (
+        {resource.email && (
           <div className="flex items-center text-sm text-foreground/70">
             <Mail className="w-4 h-4 mr-2 text-primary" />
-            <a href={`mailto:${resource.contactInfo.email}`} className="hover:underline">
-              {resource.contactInfo.email}
+            <a href={`mailto:${resource.email}`} className="hover:underline">
+              {resource.email}
             </a>
           </div>
         )}
-        {/* {resource.contactInfo.website && (
-          <div className="flex items-center text-sm text-foreground/70">
-            <Globe className="w-4 h-4 mr-2 text-primary" />
-            <a 
-              href={resource.contactInfo.website.startsWith('http') 
-                ? resource.contactInfo.website 
-                : `https://${resource.contactInfo.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline break-all"
-            >
-              {resource.contactInfo.website}
-            </a>
-          </div>
-        )} */}
       </div>
     );
   };
 
-  // const getHours = () => {
-  //   if (!resource.hours) return null;
-    
-  //   return (
-  //     <div className="mt-4">
-  //       <h4 className="text-sm font-bold text-foreground/80 mb-2">Hours</h4>
-  //       <div className="space-y-1 text-sm text-foreground/70">
-  //         {Object.entries(resource.hours).map(([day, time]) => (
-  //           <div key={day} className="flex justify-between">
-  //             <span className="capitalize">{day}:</span>
-  //             <span>{time || 'Closed'}</span>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   const getAdminActions = () => {
-    if (!isAuthenticated || user?.role !== 'admin') return null;
-
     return (
       <div className="mt-6 pt-4 border-t border-border">
         <h4 className="text-sm font-bold text-foreground/80 mb-3">Admin Actions</h4>
@@ -105,11 +68,6 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
       </div>
     );
   };
-
-  const encodeLocation = (resource.location)
-  // (lat: number, lng: number, address: string, city: string, country: string) => {
-    // return `${lat},${lng},${address},${city},${country}`;
-  // };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -137,13 +95,15 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
                 <div className="flex items-center">
                   <div 
                     className={`w-3 h-3 rounded-full mr-2 ${
-                      resource.status === 'available' ? 'bg-success' : 
-                      resource.status === 'limited' ? 'bg-warning' : 'bg-danger'
+                      resource.status === 'AVAILABLE' ? 'bg-success' : 
+                      resource.status === 'LIMITED' ? 'bg-warning' :
+                      resource.status === 'TEMPORARY_CLOSED' ? 'bg-card' : 'bg-danger'
                     }`}
                   />
                   <span className="text-sm font-bold capitalize">
-                    {resource.status === 'available' ? 'Available' : 
-                     resource.status === 'limited' ? 'Limited Availability' : 'Unavailable'}
+                    {resource.status === 'AVAILABLE' ? 'Available' : 
+                     resource.status === 'LIMITED' ? 'Limited Availability' :
+                     resource.status === 'TEMPORARY_CLOSED' ? 'Temporary Closed' : 'Unavailable'}
                   </span>
                 </div>
                 {getStatusBadge()}
@@ -151,12 +111,12 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
               
               <div className="mt-4 flex items-center text-sm text-foreground/70">
                 <MapPin className="w-4 h-4 mr-2 text-primary shrink-0" />
-                <span>{resource.location.lat}N, {resource.location.lng}E, {resource.location.address}, {resource.location.city}, {resource.location.country}</span>
+                <span>{resource.latitude}N, {resource.longitude}E, {resource.address}, {resource.city}, {resource.country}</span>
               </div>
               
               <div className="mt-2 flex items-center text-sm text-foreground/70">
                 <Clock className="w-4 h-4 mr-2 text-primary shrink-0" />
-                <span>Last updated: {new Date(resource.lastUpdated).toLocaleDateString()}</span>
+                <span>Last updated: {new Date(resource.updated_at).toLocaleDateString()}</span>
               </div>
               
               {resource.description && (
@@ -183,11 +143,11 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
                 </div>
               )}
               
-              {/* {resource.submittedBy && (
+              {resource.submitted_by && (
                 <div className="mt-4 text-xs text-foreground/50">
-                  <p>Submitted by: {resource.submittedBy}</p>
+                  <p>Submitted by: {resource.submitted_by.name}</p>
                 </div>
-              )} */}
+              )}
               
               {getAdminActions()}
             </div>
@@ -196,7 +156,7 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
               <button
                 onClick={() => {
                   // TODO: Implement get directions
-                  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(resource.location.address || ''), encodeURIComponent(resource.location.city || ''), encodeURIComponent(resource.location.country || '')}`;
+                  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(resource.address || ''), encodeURIComponent(resource.city || ''), encodeURIComponent(resource.country || '')}`;
                   window.open(mapsUrl, '_blank');
                 }}
                 className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center"

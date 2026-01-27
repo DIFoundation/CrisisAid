@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase";
 
-export const getSubmissions = async () => {
+export const getSubmissions = async (verified?: string) => {
   return supabase
     .from("submissions")
     .select(`
@@ -9,6 +9,7 @@ export const getSubmissions = async () => {
       reviewed_by:users!submissions_reviewed_by_fkey(id, name),
       resource:resources(id, name, type)
     `)
+    .eq("verified", verified)
     .order("created_at", { ascending: false });
 };
 

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 export default function AdminLogin() {
   const [name, setName] = useState("");
@@ -54,18 +55,29 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store auth token
-        localStorage.setItem('authToken', data.session.access_token);
-        
-        // Store user data
-        localStorage.setItem('userData', JSON.stringify(data.data.user));
-        
+        // After successful login, set cookies instead of localStorage
+        Cookies.set('authToken', data.session.access_token, { 
+          expires: 7,
+          secure: true,
+          sameSite: 'lax',
+        });
+
+        Cookies.set('data', JSON.stringify(data.data.user), { 
+          expires: 7,
+          secure: true,
+          sameSite: 'lax',
+        });
+
         // console.log('data: ', data);
         toast.success(`Welcome back, ${data.data.user.name}!`);
         
         // Redirect based on role
-        if (data.data.user.role === 'ADMIN' || data.data.user.role === 'VOLUNTEER') {
+        if (data.data.user.role === 'ADMIN') {
           router.push("/admin");
+        } else if (data.data.user.role === 'VOLUNTEER') {
+          router.push("/volunteer");
+        } else if (data.data.user.role === 'USER') {
+          router.push("/map");
         } else {
           router.push("/");
         }

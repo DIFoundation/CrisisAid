@@ -3,17 +3,19 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { LayoutDashboard, Gem, Send, TriangleAlert, Users, User, LogOut } from 'lucide-react';
-
+import { useRouter } from 'next/navigation';
 // Import components
 import Dashboard from './components/Dashboard';
 import Submissions from './components/Submissions';
 import Alerts from './components/Alerts';
 import UsersList from './components/Users';
 import Resources from './components/Resources';
+import Cookies from 'js-cookie';
 
 type Tab = 'dashboard' | 'resources' | 'submissions' | 'alerts' | 'users';
 
 export default function AdminPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserData] = useState<any>(null);
@@ -45,10 +47,10 @@ export default function AdminPage() {
 
   useEffect(() => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = Cookies.get('authToken');
       if (!token) {
         toast.error('You are not logged in');
-        console.log('You are not logged in');
+        // router.push('/user');
         return;
       }
       const fetchLoggedinUser = async () => {
@@ -59,7 +61,7 @@ export default function AdminPage() {
           },
         });
         const data = await response.json();
-        console.log('data: ', data);
+        // console.log('data: ', data);
         setUserData(data);
       };
       fetchLoggedinUser();
@@ -67,6 +69,23 @@ export default function AdminPage() {
       console.error(error);
     }
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('https://crisisaid-backend.onrender.com/api/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('authToken')}`,
+        },
+      });
+      Cookies.remove('authToken');
+      toast.success('You have been logged out');
+      router.push('/user');
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -101,10 +120,7 @@ export default function AdminPage() {
           </nav>
           {/* log out button */}
           <button
-            onClick={() => {
-              localStorage.removeItem('token');
-              window.location.href = '/user';
-            }}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 p-5 text-light-bg/60 hover:bg-card-light/5 rounded-lg transition-colors"
           >
             <LogOut size={20} />

@@ -1,25 +1,25 @@
-// Resource types
-export interface Resource {
+export type ResourceType = 'SHELTER' | 'FOOD' | 'MEDICAL' | 'WATER' | 'CLOTHING' | 'OTHER'; 
+
+export type ResourceStatus = 'AVAILABLE' | 'LIMITED' | 'UNAVAILABLE' | 'TEMPORARY_CLOSED';
+
+export type AlertSeverity = 'INFO' | 'WARNING' | 'DANGER' | 'CRITICAL';
+
+export type SubmissionType = 'NEW_RESOURCE' | 'RESOURCE_UPDATE' | 'REPORT';
+
+export type SubmissionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+// User types
+export interface User {
   id: string;
   name: string;
-  type: ResourceType;
-  location: Location;
-  status: ResourceStatus;
-  description?: string;
-  contactInfo?: {
-    phone: string,
-    email: string,
-  };
+  email: string;
+  role: 'USER' | 'ADMIN' | 'VOLUNTEER';
   verified: boolean;
-  lastUpdated: string;
-  capacity?: number;
-  currentOccupancy?: number;
-  notes?: string;
+  organization?: string;
+  phone: string;
+  created_at: string;
+  updated_at: string;
 }
-
-export type ResourceType = 'medical' | 'shelter' | 'food' | 'water' | 'power' | 'other';
-
-export type ResourceStatus = 'available' | 'limited' | 'unavailable' | 'temporary_closed';
 
 export interface Location {
   lat: string;
@@ -29,46 +29,60 @@ export interface Location {
   country?: string;
 }
 
+// Resource types
+export interface Resource{
+  id: string;
+  name: string;
+  type: ResourceType;
+  status: ResourceStatus;
+  description: string;
+  verified: boolean;
+  capacity: number;
+  current_occupancy: number;
+  latitude: number;
+  longitude: number;
+  address: string;
+  city: string;
+  country: string;
+  phone: string;
+  email: string;
+  operating_hours: string;
+  notes: string;
+  submitted_by: User;
+  verified_by: User;
+  created_at: string;
+  updated_at: string;
+}
+
 // Emergency Alert types
-export interface EmergencyAlert {
+export interface Alert {
   id: string;
   title: string;
   message: string;
-  severity: 'info' | 'warning' | 'danger' | 'critical';
-  location?: Location;
-  startTime: string;
-  endTime?: string;
-  affectedAreas?: string[];
-  instructions?: string;
+  severity: AlertSeverity;
+  latitude: number;
+  longitude: number;
+  radius_km: number;
+  address: string;
+  affected_areas: [string];
+  instructions: string;
+  active: boolean;
+  start_time: string;
+  end_time: string;
+  created_by: User;
+  created_at: string;
+  updated_at: string;
 }
 
-// User types
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: 'user' | 'admin' | 'moderator';
-  organization?: string;
-  lastActive: string;
-}
-
-// Submission types
 export interface Submission {
-  id: string;
-  resource: Omit<Resource, 'id' | 'verified' | 'lastUpdated'>;
-  submittedBy: string; // User ID
-  submittedAt: string;
-  status: 'pending' | 'approved' | 'rejected';
-  reviewedBy?: string; // User ID
-  reviewedAt?: string;
-  reviewNotes?: string;
-}
-
-// API Response types
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-  message?: string;
-  timestamp: string;
+  id:	string;
+  type:	SubmissionType;
+  resource_id:	string;
+  data:	Resource;
+  status:	SubmissionStatus;
+  submitted_by:	User;
+  reviewed_by?:	User;
+  review_notes?:	string;
+  created_at:	string;
+  reviewed_at?:	string
 }

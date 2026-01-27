@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import * as SubmissionService from "../services/submission.service";
 
-export const fetchSubmissions = async (_: Request, res: Response) => {
+export const fetchSubmissions = async (req: Request, res: Response) => {
   try {
-    const { data, error } = await SubmissionService.getSubmissions();
+    const { verified } = req.query;
+    const { data, error } = await SubmissionService.getSubmissions(verified as string);
     if (error) return res.status(400).json({ message: error.message });
     res.json(data);
   } catch (error: any) {
