@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useAppContext } from '@/data/context/AppContext';
 import CriticalAlert from '@/components/CriticalAlert';
 import TopSearchBar from '@/components/TopSearchBar';
 import ResourceDrawer from '@/components/ResourceDrawer';
@@ -21,23 +20,14 @@ const LeafletMap = dynamic(() => import('@/components/LeafletMap'), {
 
 export default function MapPage() {
   const router = useRouter()
-  const {
-    resources,
-    alerts,
-    isLoading,
-    fetchResources,
-    fetchAlerts,
-    selectedResource,
-    selectResource,
-  } = useAppContext();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [filteredResources, setFilteredResources] = useState(resources);
+  const [filteredResources, setFilteredResources] = useState([]);
 
   // Extract unique resource types from resources
   const resourceTypes = useMemo(() => {
     const types = new Set<string>();
-    resources.forEach(resource => {
+    filteredResources?.forEach(resource => {
       if (resource.type) {
         types.add(resource.type);
       }
@@ -54,34 +44,31 @@ export default function MapPage() {
       { id: 'all', name: 'All Resources' },
       ...typeOptions
     ];
-  }, [resources]);
+  }, [filteredResources]);
 
   // Initial data fetch
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([fetchResources(), fetchAlerts()]);
+        const response = await fetch('https://crisisaid-backend.onrender.com/api/resources');
+        const data = await response.json();
+        setFilteredResources(data.data);
       } catch (error) {
         console.error('Error loading data:', error);
       }
     };
 
     loadData();
-  }, [fetchResources, fetchAlerts]);
-
-  // Update filtered resources when resources change
-  useEffect(() => {
-    setFilteredResources(resources);
-  }, [resources]);
+  }, []);
 
   const handleSearch = (query: string, type?: string) => {
     if (!query.trim() && (!type || type === 'all')) {
-      setFilteredResources(resources);
+      setFilteredResources([]);
       return;
     }
 
     const lowerQuery = query.toLowerCase();
-    const filtered = resources.filter((resource) => {
+    const filtered = filteredResources.filter((resource) => {
       const matchesQuery = !query.trim() ||
         resource.name.toLowerCase().includes(lowerQuery) ||
         resource.type.toLowerCase().includes(lowerQuery) ||
@@ -97,11 +84,10 @@ export default function MapPage() {
   };
 
   const handleResourceSelect = (resource: any) => {
-    selectResource(resource);
     setIsDrawerOpen(true);
   };
 
-  if (isLoading && resources.length === 0) {
+  if (filteredResources?.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -116,7 +102,7 @@ export default function MapPage() {
 
   return (
     <div className="relative h-screen w-full bg-dark-bg overflow-hidden flex flex-col">
-      <CriticalAlert key={alerts.length} />
+      {/* <CriticalAlert key={alerts.length} /> */}
 
       {/* Back home */}
       <div className="absolute top-6 left-6 z-50 px-4 pointer-events-none">
@@ -143,7 +129,7 @@ export default function MapPage() {
         <div className="absolute inset-0">
           <LeafletMap
             resources={filteredResources}
-            selectedResource={selectedResource}
+            selectedResource={null}
             onResourceSelect={handleResourceSelect}
           />
         </div>
@@ -153,7 +139,7 @@ export default function MapPage() {
       <ResourceDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        resource={selectedResource}
+        resource={null}
       />
     </div>
   );

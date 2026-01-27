@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
+import Cookies from "js-cookie";
 import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
 
 // Types
@@ -92,7 +92,7 @@ export default function Resources() {
     const fetchResources = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("authToken");
+        const token = Cookies.get("authToken");
         const response = await fetch(
           "https://crisisaid-backend.onrender.com/api/resources",
           {
@@ -123,10 +123,10 @@ export default function Resources() {
   const filteredResources = resources.filter((resource) => {
     const matchesFilter = filter === "all" || resource.type === filter;
     const matchesSearch =
-      resource.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.status.toLowerCase().includes(searchQuery.toLowerCase());
+      resource.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      resource.status?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -173,7 +173,7 @@ export default function Resources() {
     if (!resourceToDelete) return;
 
     try {
-      const token = localStorage.getItem("authToken");
+      const token = Cookies.get("authToken");
       const response = await fetch(
         `https://crisisaid-backend.onrender.com/api/resources/${resourceToDelete}`,
         {
@@ -203,7 +203,7 @@ export default function Resources() {
     if (!currentResource) return;
 
     try {
-      const token = localStorage.getItem("authToken");
+      const token = Cookies.get("authToken");
       const isUpdate = !!currentResource.id;
       const url = isUpdate
         ? `https://crisisaid-backend.onrender.com/api/resources/${currentResource.id}`

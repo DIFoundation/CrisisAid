@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format } from 'date-fns';
+import Cookies from 'js-cookie';
 import { Search, User, Mail, Shield, ShieldAlert, Pencil, Trash2, Check, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -46,7 +46,7 @@ export default function Users() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('authToken');
+        const token = Cookies.get('authToken');
         const response = await fetch('https://crisisaid-backend.onrender.com/api/users', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -94,7 +94,7 @@ export default function Users() {
   const updateUserRole = async (userId: string, newRole: UserRole) => {
     try {
       setUpdating(userId);
-      const token = localStorage.getItem('authToken');
+      const token = Cookies.get('authToken');
       const response = await fetch(`https://crisisaid-backend.onrender.com/api/users/${userId}/role`, {
         method: 'PATCH',
         headers: {
@@ -124,7 +124,7 @@ export default function Users() {
   const updateUserStatus = async (userId: string, newStatus: boolean) => {
     try {
       setUpdating(userId);
-      const token = localStorage.getItem('authToken');
+      const token = Cookies.get('authToken');
       const response = await fetch(`https://crisisaid-backend.onrender.com/api/users/${userId}/verify`, {
         method: 'PATCH',
         headers: {
@@ -156,7 +156,7 @@ export default function Users() {
     
     try {
       setUpdating(userToDelete);
-      const token = localStorage.getItem('authToken');
+      const token = Cookies.get('authToken');
       const response = await fetch(`https://crisisaid-backend.onrender.com/api/users/${userToDelete}`, {
         method: 'DELETE',
         headers: {

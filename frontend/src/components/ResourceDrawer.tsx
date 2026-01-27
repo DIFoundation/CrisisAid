@@ -1,7 +1,6 @@
 import React from 'react';
 import { X, MapPin, Clock, Phone, Globe, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail } from 'lucide-react';
 import { Resource } from '@/types';
-import { useAppContext } from '@/data/context/AppContext';
 
 type ResourceDrawerProps = {
   isOpen: boolean;
@@ -10,7 +9,6 @@ type ResourceDrawerProps = {
 };
 
 const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resource }) => {
-  const { user, isAuthenticated } = useAppContext();
 
   if (!isOpen || !resource) return null;
 
@@ -51,46 +49,11 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
             </a>
           </div>
         )}
-        {/* {resource.contactInfo.website && (
-          <div className="flex items-center text-sm text-foreground/70">
-            <Globe className="w-4 h-4 mr-2 text-primary" />
-            <a 
-              href={resource.contactInfo.website.startsWith('http') 
-                ? resource.contactInfo.website 
-                : `https://${resource.contactInfo.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline break-all"
-            >
-              {resource.contactInfo.website}
-            </a>
-          </div>
-        )} */}
       </div>
     );
   };
 
-  // const getHours = () => {
-  //   if (!resource.hours) return null;
-    
-  //   return (
-  //     <div className="mt-4">
-  //       <h4 className="text-sm font-bold text-foreground/80 mb-2">Hours</h4>
-  //       <div className="space-y-1 text-sm text-foreground/70">
-  //         {Object.entries(resource.hours).map(([day, time]) => (
-  //           <div key={day} className="flex justify-between">
-  //             <span className="capitalize">{day}:</span>
-  //             <span>{time || 'Closed'}</span>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   const getAdminActions = () => {
-    if (!isAuthenticated || user?.role !== 'admin') return null;
-
     return (
       <div className="mt-6 pt-4 border-t border-border">
         <h4 className="text-sm font-bold text-foreground/80 mb-3">Admin Actions</h4>
@@ -105,11 +68,6 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
       </div>
     );
   };
-
-  const encodeLocation = (resource.location)
-  // (lat: number, lng: number, address: string, city: string, country: string) => {
-    // return `${lat},${lng},${address},${city},${country}`;
-  // };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">

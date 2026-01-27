@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Cookies from 'js-cookie';
 import { format } from 'date-fns';
 
 // Types
@@ -40,7 +41,7 @@ export default function Submissions() {
     const fetchSubmissions = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('authToken');
+        const token = Cookies.get('authToken');
         const response = await fetch('https://crisisaid-backend.onrender.com/api/submissions', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -82,7 +83,7 @@ export default function Submissions() {
   // Handle submission status update
   const updateSubmissionStatus = async (id: string, status: 'APPROVED' | 'REJECTED') => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = Cookies.get('authToken');
       const endpoint = `https://crisisaid-backend.onrender.com/api/submissions/${id}/${status.toLowerCase()}`;
       
       const response = await fetch(endpoint, {

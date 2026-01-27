@@ -55,10 +55,10 @@ const MapController = ({
   const [initialViewSet, setInitialViewSet] = useState(false);
 
   useEffect(() => {
-    if (selectedResource && selectedResource.location) {
-      const { lat, lng } = selectedResource.location;
+    if (selectedResource && selectedResource.latitude) {
+      const { lat, lng } = selectedResource.latitude && selectedResource.longitude;
       map.flyTo([lat, lng], 15, { duration: 1 });
-    } else if (!initialViewSet && resources.length > 0) {
+    } else if (!initialViewSet && resources?.length > 0) {
       // Set initial view to fit all markers with some padding
       const bounds = L.latLngBounds(
         resources.map((r) => [r.location.lat, r.location.lng])
@@ -126,7 +126,7 @@ const LeafletMap = ({
         )}
 
         {/* Resource Markers */}
-        {resources.map((resource) => {
+        {resources?.map((resource) => {
           const isSelected = selectedResource?.id === resource.id;
           const { lat, lng } = resource.location;
           

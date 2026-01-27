@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Gem, Send, TriangleAlert, Users } from 'lucide-react';
+import Cookies from 'js-cookie';
 
 interface Stats {
     alerts: {
@@ -157,7 +158,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const token = localStorage.getItem('authToken');
+                const token = Cookies.get('authToken');
                 const response = await fetch('https://crisisaid-backend.onrender.com/api/dashboard/stats', {
                     headers: {
                         'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ export default function Dashboard() {
                     },
                 });
 
-                console.log('response: ', response)
+                // console.log('response: ', response)
 
                 if (!response.ok) {
                     throw new Error('Failed to fetch stats');
@@ -173,7 +174,7 @@ export default function Dashboard() {
 
                 const data = await response.json();
                 setStats(data);
-                console.log('stat data: ', data)
+                // console.log('stat data: ', data)
             } catch (err) {
                 setError(err as string || 'Failed to load stats');
                 console.error('Stats error:', err);
