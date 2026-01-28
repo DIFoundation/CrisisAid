@@ -21,24 +21,28 @@ const defaultCenter = {
 // Custom marker icons
 const markerIcons = {
   SHELTER: {
-    url: '/marker-shelter.png', // You'll need to add these icons to your public folder
-    scaledSize: { width: 32, height: 32 },
+    url: '/markers/shelter.png',
+    scaledSize: new window.google.maps.Size(32, 32),
   },
   FOOD: {
-    url: '/marker-food.png',
-    scaledSize: { width: 32, height: 32 },
+    url: '/markers/food.png',
+    scaledSize: new window.google.maps.Size(32, 32),
   },
   MEDICAL: {
-    url: '/marker-medical.png',
-    scaledSize: { width: 32, height: 32 },
+    url: '/markers/medical.png',
+    scaledSize: new window.google.maps.Size(32, 32),
   },
   WATER: {
-    url: '/marker-water.png',
-    scaledSize: { width: 32, height: 32 },
+    url: '/markers/water.png',
+    scaledSize: new window.google.maps.Size(32, 32),
+  },
+  CLOTHING: {
+    url: '/markers/clothing.png',
+    scaledSize: new window.google.maps.Size(32, 32),
   },
   OTHER: {
-    url: '/marker-other.png',
-    scaledSize: { width: 32, height: 32 },
+    url: '/markers/other.png',
+    scaledSize: new window.google.maps.Size(32, 32),
   },
 };
 

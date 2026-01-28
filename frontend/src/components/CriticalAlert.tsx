@@ -2,17 +2,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, Info, AlertCircle, Bell } from 'lucide-react';
-
-type AlertSeverity = 'critical' | 'danger' | 'warning' | 'info';
-
-interface Alert {
-  id: string;
-  title: string;
-  message: string;
-  severity: AlertSeverity;
-  instructions?: string;
-  timestamp: Date;
-}
+import { Alert, AlertSeverity } from '@/types';
 
 interface CriticalAlertProps {
   alerts?: Alert[];
@@ -21,27 +11,27 @@ interface CriticalAlertProps {
 
 const getAlertIcon = (severity: AlertSeverity) => {
   switch (severity) {
-    case 'critical':
-      return <AlertTriangle size={20} className="text-white" />;
-    case 'danger':
-      return <AlertTriangle size={20} className="text-white" />;
-    case 'warning':
-      return <AlertCircle size={20} className="text-white" />;
-    case 'info':
-    default:
+    case 'INFO':
       return <Info size={20} className="text-white" />;
+    case 'DANGER':
+      return <AlertTriangle size={20} className="text-white" />;
+    case 'WARNING':
+      return <AlertCircle size={20} className="text-white" />;
+    case 'CRITICAL':
+    default:
+      return <AlertTriangle size={20} className="text-white" />;
   }
 };
 
 const getAlertColor = (severity: AlertSeverity) => {
   switch (severity) {
-    case 'critical':
+    case 'CRITICAL':
       return 'bg-red-600/90 border-red-600/80 shadow-[0_0_30px_rgba(239,68,68,0.4)]';
-    case 'danger':
+    case 'DANGER':
       return 'bg-red-500/90 border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.3)]';
-    case 'warning':
+    case 'WARNING':
       return 'bg-yellow-500/90 border-yellow-500/80 shadow-[0_0_30px_rgba(234,179,8,0.3)]';
-    case 'info':
+    case 'INFO':
     default:
       return 'bg-blue-600/90 border-blue-600/80 shadow-[0_0_30px_rgba(30,58,138,0.3)]';
   }
@@ -127,7 +117,7 @@ export default function CriticalAlert({
             
             <div className="mt-2 pt-2 border-t border-white/10">
               <p className="text-xs text-white/60">
-                {new Date(visibleAlert.timestamp).toLocaleString()}
+                {new Date(visibleAlert.created_at).toLocaleString()}
               </p>
             </div>
           </div>

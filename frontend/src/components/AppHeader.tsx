@@ -25,7 +25,7 @@ export default function AppHeader({
   showBackButton = false,
   onBack,
   initialSearchQuery = '',
-//   initialResourceType = 'all',
+  //   initialResourceType = 'all',
 }: AppHeaderProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
@@ -41,28 +41,28 @@ export default function AppHeader({
     const token = Cookies.get('authToken');
 
     if (!token) {
-        toast.error('You are not logged in');
+      toast.error('You are not logged in');
       return;
     }
 
     try {
-        fetch('https://crisisaid-backend.onrender.com/api/auth/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        Cookies.remove('authToken');
-        Cookies.remove('userData');
-        router.push('/user');
-      }
-    })
-    .catch(error => {
-      console.error('Logout failed:', error);
-    });
+      fetch('https://crisisaid-backend.onrender.com/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(response => {
+          if (response.ok) {
+            Cookies.remove('authToken');
+            Cookies.remove('userData');
+            router.push('/user');
+          }
+        })
+        .catch(error => {
+          console.error('Logout failed:', error);
+        });
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -70,7 +70,7 @@ export default function AppHeader({
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container flex h-14 items-center px-4 md:px-6">
+      <div className="container flex h-14 items-center px-4 md:px-6 justify-between">
         {/* Mobile Menu Button */}
         <div className="flex items-center space-x-2 md:hidden">
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -82,18 +82,18 @@ export default function AppHeader({
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] p-0">
               <nav className="flex flex-col h-full p-4 space-y-4">
-              <Button 
-                variant="ghost" 
-                className="justify-start"
-                onClick={() => router.push('/')}
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => router.push('/')}
                 >
                   <Home className="mr-2 h-4 w-4" />
                   Home
                 </Button>
-                <Button 
-                variant="ghost" 
-                className="justify-start"
-                onClick={() => router.push('/userProfile')}
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => router.push('/userProfile')}
                 >
                   <User className="mr-2 h-4 w-4" />
                   Profile
@@ -105,7 +105,7 @@ export default function AppHeader({
               </nav>
             </SheetContent>
           </Sheet>
-          
+
           {showBackButton && onBack && (
             <Button variant="ghost" size="icon" onClick={onBack}>
               <X className="h-5 w-5" />
@@ -149,16 +149,16 @@ export default function AppHeader({
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-2">
-        <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => router.push('/')}
           >
             <Home className="mr-2 h-4 w-4" />
             Home
           </Button>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => router.push('/userProfile')}
           >

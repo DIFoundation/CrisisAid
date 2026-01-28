@@ -1,24 +1,76 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
+import { getAuthToken } from '@/lib/cookies';
 import { LayoutDashboard, Gem, Send, TriangleAlert, Users, User, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-// Import components
-import Dashboard from './components/Dashboard';
-import Submissions from './components/Submissions';
-import Alerts from './components/Alerts';
-import UsersList from './components/Users';
-import Resources from './components/Resources';
 import Cookies from 'js-cookie';
 
 type Tab = 'dashboard' | 'resources' | 'submissions' | 'alerts' | 'users';
+
+// Dynamically import admin components with SSR disabled
+const AdminDashboard = dynamic(
+  () => import('./components/Dashboard'),
+  { ssr: false }
+);
+
+const AdminResources = dynamic(
+  () => import('./components/Resources'),
+  { ssr: false }
+);
+
+const AdminSubmissions = dynamic(
+  () => import('./components/Submissions'),
+  { ssr: false }
+);
+
+const AdminAlerts = dynamic(
+  () => import('./components/Alerts'),
+  { ssr: false }
+);
+
+const AdminUsers = dynamic(
+  () => import('./components/Users'),
+  { ssr: false }
+);
 
 export default function AdminPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      toast.error('You are not logged in');
+      router.push('/user');
+      return;
+    }
+
+    // Additional authentication logic if needed
+    const verifyToken = async () => {
+      try {
+        const response = await fetch('https://crisisaid-backend.onrender.com/api/auth/me', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Authentication failed');
+        }
+      } catch (error) {
+        toast.error('Session expired. Please log in again.');
+        router.push('/user');
+      }
+    };
+
+    verifyToken();
+  }, [router]);
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -31,17 +83,17 @@ export default function AdminPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard />;
+        return <AdminDashboard />;
       case 'resources':
-        return <Resources />;
+        return <AdminResources />;
       case 'submissions':
-        return <Submissions />;
+        return <AdminSubmissions />;
       case 'alerts':
-        return <Alerts />;
+        return <AdminAlerts />;
       case 'users':
-        return <UsersList />;
+        return <AdminUsers />;
       default:
-        return <Dashboard />;
+        return <AdminDashboard />;
     }
   };
 

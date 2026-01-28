@@ -1,47 +1,39 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Resource } from '@/types';
+import { Loader2 } from 'lucide-react';
 
-// Fix for default marker icons in Next.js
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/images/marker-icon-2x.png',
-  iconUrl: '/images/marker-icon.png',
-  shadowUrl: '/images/marker-shadow.png',
-});
+// Create a dynamic import for the map container to avoid SSR issues
+const DynamicMapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+);
 
-// Custom marker icons
-const createCustomIcon = (status: string) => {
-  const color = {
-    available: '#10B981', // green-500
-    limited: '#F59E0B',   // amber-500
-    unavailable: '#EF4444', // red-500
-  }[status] || '#3B82F6'; // blue-500 as default
+// Create a dynamic import for other Leaflet components
+const DynamicTileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+);
 
-  return L.divIcon({
-    html: `
-      <div class="relative">
-        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path 
-            d="M16 0C7.163 0 0 7.163 0 16C0 27.5 16 40 16 40C16 40 32 27.5 32 16C32 7.163 24.837 0 16 0Z" 
-            fill="${color}"
-            class="drop-shadow-lg"
-          />
-          <circle cx="16" cy="14" r="8" fill="white" fill-opacity="0.9" />
-        </svg>
-      </div>
-    `,
-    className: 'bg-transparent border-none',
-    iconSize: [32, 40],
-    iconAnchor: [16, 40],
-    popupAnchor: [0, -40],
-  });
-};
+const DynamicMarker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker),
+  { ssr: false }
+);
+
+const DynamicPopup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Popup),
+  { ssr: false }
+);
+
+const DynamicCircle = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Circle),
+  { ssr: false }
+);
 
 // Component to handle map view changes
 const MapController = ({
@@ -52,21 +44,15 @@ const MapController = ({
   resources: Resource[];
 }) => {
   const map = useMap();
-  const [initialViewSet, setInitialViewSet] = useState(false);
 
   useEffect(() => {
-    if (selectedResource && selectedResource.latitude) {
-      const { latitude, longitude } = selectedResource;
-      map.flyTo([latitude, longitude], 15, { duration: 1 });
-    } else if (!initialViewSet && resources?.length > 0) {
-      // Set initial view to fit all markers with some padding
-      const bounds = L.latLngBounds(
-        resources.map((r) => [r.latitude, r.longitude])
+    if (selectedResource) {
+      map.flyTo(
+        [(selectedResource.latitude), (selectedResource.longitude)],
+        15
       );
-      map.fitBounds(bounds.pad(0.1));
-      setInitialViewSet(true);
     }
-  }, [selectedResource, resources, map, initialViewSet]);
+  }, [selectedResource, map]);
 
   return null;
 };
@@ -79,122 +65,117 @@ interface LeafletMapProps {
   zoom: number;
 }
 
-const LeafletMap = ({
+function LeafletMap({
   resources,
   selectedResource,
   onResourceSelect,
   center,
   zoom,
-}: LeafletMapProps) => {
+}: LeafletMapProps) {
+  const [mounted, setMounted] = useState(false);
   const mapRef = useRef<L.Map>(null);
-  const [mapReady, setMapReady] = useState(false);
 
-  // Handle map initialization
   useEffect(() => {
-    if (typeof window !== 'undefined' && !mapReady) {
-      setMapReady(true);
+    setMounted(true);
+    
+    // Fix for default marker icons
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: '/images/marker-icon-2x.png',
+        iconUrl: '/images/marker-icon.png',
+        shadowUrl: '/images/marker-shadow.png',
+      });
     }
+    
+    return () => setMounted(false);
   }, []);
 
-  if (!mapReady) {
+  if (!mounted) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-card/50">
-        <div className="animate-pulse text-foreground/70">Loading map...</div>
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
+  const createCustomIcon = (status: string) => {
+    const color = {
+      available: '#10B981', // green-500
+      limited: '#F59E0B',   // amber-500
+      unavailable: '#EF4444', // red-500
+    }[status] || '#3B82F6'; // blue-500 as default
+
+    return L.divIcon({
+      html: `
+        <div class="relative">
+          <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path 
+              d="M16 0C7.163 0 0 7.163 0 16C0 27.5 16 40 16 40C16 40 32 27.5 32 16C32 7.163 24.837 0 16 0Z" 
+              fill="${color}"
+              class="drop-shadow-lg"
+            />
+            <circle cx="16" cy="14" r="8" fill="white" fillOpacity="0.9" />
+          </svg>
+        </div>
+      `,
+      className: 'bg-transparent border-none',
+      iconSize: [32, 40],
+      iconAnchor: [16, 40],
+      popupAnchor: [0, -40],
+    });
+  };
+
   return (
-    <div className="w-full h-full">
-      <MapContainer
-        center={center || [0, 0]} // Default center (will be overridden by MapController)
-        zoom={zoom || 12}
+    <div className="h-full w-full">
+      <DynamicMapContainer
+        center={center}
+        zoom={zoom}
         style={{ height: '100%', width: '100%' }}
-        zoomControl={false}
         ref={mapRef}
-        className="z-0"
+        zoomControl={false}
       >
-        {/* Base Map Tiles */}
-        <TileLayer
+        <DynamicTileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+        
+        <MapController 
+          selectedResource={selectedResource} 
+          resources={resources} 
+        />
 
-        {/* Dark Mode Tiles (optional) */}
-        {typeof document !== 'undefined' && 
-          document.documentElement.classList.contains('dark') && (
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            />
-        )}
-
-        {/* Resource Markers */}
-        {resources?.map((resource) => {
-          const isSelected = selectedResource?.id === resource.id;
-          const { latitude, longitude } = resource;
+        {resources.map((resource) => {
+          const lat = resource.latitude;
+          const lng = resource.longitude;
           
+          if (isNaN(lat) || isNaN(lng)) return null;
+
           return (
-            <Marker
+            <DynamicMarker
               key={resource.id}
-              position={[latitude, longitude]}
-              icon={createCustomIcon(resource.status)}
+              position={[lat, lng]}
+              icon={createCustomIcon(resource.status?.toLowerCase() || '')}
               eventHandlers={{
                 click: () => onResourceSelect(resource),
               }}
-              zIndexOffset={isSelected ? 1000 : 1}
             >
-              <Popup
-                closeButton={false}
-                className="leaflet-popup-custom"
-                offset={[0, -20]}
-              >
-                <div className="p-2 text-sm">
-                  <h4 className="font-semibold text-foreground">{resource.name}</h4>
-                  <p className="text-foreground/70">
-                    {resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}
+              <DynamicPopup>
+                <div className="p-2">
+                  <h3 className="font-bold">{resource.name}</h3>
+                  <p className="text-sm">{resource.address}</p>
+                  <p className="text-xs text-gray-500">
+                    {resource.city}, {resource.state}
                   </p>
-                  {resource.status === 'AVAILABLE' && (
-                    <p className="text-green-500 text-xs mt-1">Available</p>
-                  )}
-                  {resource.status === 'LIMITED' && (
-                    <p className="text-amber-500 text-xs mt-1">Limited availability</p>
-                  )}
-                  {resource.status === 'TEMPORARY_CLOSED' && (
-                    <p className="text-red-400 text-xs mt-1">Temporary closed</p>
-                  )}
-                  {resource.status === 'UNAVAILABLE' && (
-                    <p className="text-red-500 text-xs mt-1">Currently unavailable</p>
-                  )}
                 </div>
-              </Popup>
-              
-              {/* Highlight circle for selected marker */}
-              {isSelected && (
-                <Circle
-                  center={[latitude, longitude]}
-                  radius={50}
-                  pathOptions={{
-                    fillColor: '#3B82F6',
-                    fillOpacity: 0.2,
-                    color: '#3B82F6',
-                    weight: 2,
-                    opacity: 0.7,
-                  }}
-                />
-              )}
-            </Marker>
+              </DynamicPopup>
+            </DynamicMarker>
           );
         })}
-
-        {/* Map controller for handling view changes */}
-        <MapController
-          selectedResource={selectedResource}
-          resources={resources}
-        />
-      </MapContainer>
+      </DynamicMapContainer>
     </div>
   );
-};
+}
 
 export default LeafletMap;

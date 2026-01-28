@@ -1,14 +1,27 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Resource } from '@/types';
+import dynamic from 'next/dynamic';
+import { Alert, Resource } from '@/types';
 import AppHeader from '@/components/AppHeader';
 import ResourceDrawer from '@/components/ResourceDrawer';
-import LeafletMap from '@/components/LeafletMap';
-// import CriticalAlert from '@/components/CriticalAlert';
+import CriticalAlert from '@/components/CriticalAlert';
+
+// Dynamically import LeafletMap with SSR disabled
+const LeafletMap = dynamic(
+  () => import('@/components/LeafletMap'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
+);
 
 export default function MapPage() {
   const router = useRouter();
@@ -19,7 +32,28 @@ export default function MapPage() {
   const [loading, setLoading] = useState(true);
   const [center, setCenter] = useState<[number, number]>([0, 0]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [isClient, setIsClient] = useState(false);
 
+  // Set isClient to true after mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // load alert
+  useEffect(() => {
+    const loadAlert = async () => {
+      try {
+        const alertData = await fetch('https://crisisaid-backend.onrender.com/api/alerts');
+        const data = await alertData.json();
+
+        setAlerts(data)
+      } catch (error) {
+        toast.error('Error loading alert')
+      }
+    }
+    loadAlert()
+  }, [])
 
   // Load resources
   useEffect(() => {
@@ -58,6 +92,10 @@ export default function MapPage() {
     setSelectedResource(resource);
     setIsDrawerOpen(true);
   }, []);
+
+  const handleDismiss = (alertId: string) => {
+    setAlerts(alerts.filter(alert => alert.id !== alertId));
+  };
 
   // Handle search
   const handleSearch = useCallback((query: string, type?: string) => {
@@ -98,18 +136,20 @@ export default function MapPage() {
 
       {/* Main Content */}
       <main className="flex-1 relative">
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <LeafletMap 
-            resources={resources}
-            selectedResource={selectedResource}
-            onResourceSelect={handleResourceSelect}
-            center={center}
-            zoom={13}
-          />
+        {isClient && (
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          }>
+            <LeafletMap
+              resources={resources}
+              selectedResource={selectedResource}
+              onResourceSelect={handleResourceSelect}
+              center={center}
+              zoom={13}
+            />
+          </Suspense>
         )}
       </main>
 
@@ -118,6 +158,11 @@ export default function MapPage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         resource={selectedResource}
+      />
+      
+      <CriticalAlert 
+        alerts={alerts} 
+        onDismiss={handleDismiss} 
       />
     </div>
   );
