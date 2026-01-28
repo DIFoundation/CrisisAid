@@ -43,6 +43,7 @@ export interface Resource{
   longitude: number;
   address: string;
   city: string;
+  state: string;
   country: string;
   phone: string;
   email: string;

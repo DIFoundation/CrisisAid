@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import Cookies from "js-cookie";
 import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import LocationPicker from '@/components/LocationPicker';
+import { toast } from "sonner";
 
 // Types
 type ResourceType =
@@ -46,11 +48,16 @@ type Resource = {
   longitude: number;
   address: string;
   city: string;
+  state: string;
   country: string;
   phone: string;
   email: string;
   operating_hours: string;
   notes: string;
+  submitted_by: {
+    id: string;
+    name: string;
+  };
 };
 
 type FilterType = "all" | ResourceType;
@@ -150,6 +157,7 @@ export default function Resources() {
       longitude: 0,
       address: "",
       city: "",
+      state: "",
       country: "",
       phone: "",
       email: "",
@@ -192,9 +200,10 @@ export default function Resources() {
       setResources(resources.filter((r) => r.id !== resourceToDelete));
       setIsDeleteDialogOpen(false);
       setResourceToDelete(null);
+      toast.success("Resource deleted successfully");
     } catch (err) {
-      console.error("Error deleting resource:", err);
-      // Show error toast or message
+      // console.error("Error deleting resource:", err);
+      toast.error("Error deleting resource");
     }
   };
 
@@ -235,10 +244,23 @@ export default function Resources() {
 
       setIsDialogOpen(false);
       setCurrentResource(null);
+      toast.success("Resource submitted successfully");
     } catch (err) {
-      console.error("Error saving resource:", err);
-      // Show error toast or message
+      // console.error("Error saving resource:", err);
+      toast.error("Error saving resource");
     }
+  };
+
+  const handleLocationSelect = (location: any) => {
+    setCurrentResource((prev) => ({
+      ...prev,
+      latitude: location.lat,
+      longitude: location.lng,
+      address: location.address || "",
+      city: location.city || "",
+      state: location.state || "",
+      country: location.country || "",
+    }));
   };
 
   // Status badge color mapping
@@ -249,7 +271,7 @@ export default function Resources() {
       case "LIMITED":
         return "secondary";
       case "TEMPORARILY_CLOSED":
-        return "warning";
+        return "outline";
       case "UNAVAILABLE":
         return "destructive";
       default:
@@ -265,7 +287,7 @@ export default function Resources() {
       case "WATER":
         return "secondary";
       case "SHELTER":
-        return "warning";
+        return "outline";
       case "MEDICAL":
         return "destructive";
       case "CLOTHING":
@@ -338,7 +360,8 @@ export default function Resources() {
               <TableHead>Status</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Location</TableHead>
-              <TableHead>Last Checked</TableHead>
+              <TableHead>Operating Hours</TableHead>
+              <TableHead>Submitted By</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -375,12 +398,10 @@ export default function Resources() {
                     {resource.address}
                   </TableCell>
                   <TableCell>
-                    {/* {resource.operating_hours
-                      ? format(
-                          new Date(resource.operating_hours),
-                          "MMM d, yyyy"
-                        )
-                      : "N/A"} */}
+                    {resource.operating_hours}
+                  </TableCell>
+                  <TableCell>
+                    {resource.submitted_by.name}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button
@@ -443,53 +464,63 @@ export default function Resources() {
       )}
 
       {/* Add/Edit Resource Dialog */}
-      {isDialogOpen && currentResource && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4">
-              {currentResource.id ? "Edit Resource" : "Add New Resource"}
+      {currentResource && (
+        <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${isDialogOpen ? 'block' : 'hidden'}`}>
+          <div className="bg-background rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">
+              {currentResource.id ? 'Edit Resource' : 'Add New Resource'}
             </h2>
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Name *</label>
+                  <label className="text-sm font-medium">Resource Name *</label>
                   <Input
-                    value={currentResource.name || ""}
+                    value={currentResource.name || ''}
                     onChange={(e) =>
                       setCurrentResource({
                         ...currentResource,
                         name: e.target.value,
                       })
                     }
+                    placeholder="Enter resource name"
                     required
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Type *</label>
+                  <label className="text-sm font-medium">Resource Type</label>
                   <Select
-                    value={currentResource.type || "FOOD"}
+                    value={currentResource.type}
                     onValueChange={(value: ResourceType) =>
-                      setCurrentResource({ ...currentResource, type: value })
+                      setCurrentResource({
+                        ...currentResource,
+                        type: value,
+                      })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {resourceTypes.map(({ value, label }) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
+                      {resourceTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Status *</label>
+                  <label className="text-sm font-medium">Status</label>
                   <Select
-                    value={currentResource.status || "AVAILABLE"}
+                    value={currentResource.status}
                     onValueChange={(value: ResourceStatus) =>
-                      setCurrentResource({ ...currentResource, status: value })
+                      setCurrentResource({
+                        ...currentResource,
+                        status: value,
+                      })
                     }
                   >
                     <SelectTrigger>
@@ -499,201 +530,218 @@ export default function Resources() {
                       {resourceStatuses.map((status) => (
                         <SelectItem key={status} value={status}>
                           {status
-                            .split("_")
-                            .map(
-                              (word) =>
-                                word.charAt(0) + word.slice(1).toLowerCase()
-                            )
-                            .join(" ")}
+                            .split('_')
+                            .map((s) => s.charAt(0) + s.slice(1).toLowerCase())
+                            .join(' ')}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Quantity *</label>
+                  <label className="text-sm font-medium">Capacity</label>
                   <Input
                     type="number"
-                    min="0"
-                    value={currentResource.capacity || 1}
+                    value={currentResource.capacity || ''}
                     onChange={(e) =>
                       setCurrentResource({
                         ...currentResource,
                         capacity: parseInt(e.target.value) || 0,
                       })
                     }
+                    min="1"
+                    placeholder="Enter capacity"
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Description *</label>
+                <textarea
+                  value={currentResource.description || ''}
+                  onChange={(e) =>
+                    setCurrentResource({
+                      ...currentResource,
+                      description: e.target.value,
+                    })
+                  }
+                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px]"
+                  placeholder="Enter description"
+                  required
+                />
+              </div>
+
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Current Occupancy
-                  </label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={currentResource.current_occupancy || 0}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        current_occupancy: parseInt(e.target.value) || 0,
-                      })
-                    }
+                  <label className="text-sm font-medium">Location</label>
+                  <div className="h-64 rounded-lg overflow-hidden border">
+                  <LocationPicker
+                    formData={{
+                      latitude: currentResource.latitude || 0,
+                      longitude: currentResource.longitude || 0,
+                      address: currentResource.address || '',
+                      city: currentResource.city || '',
+                      state: currentResource.state || '',
+                      country: currentResource.country || ''
+                    }}
+                    setFormData={handleLocationSelect}
                   />
+                  </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Address *</label>
+                    <Input
+                      value={currentResource.address || ''}
+                      onChange={(e) =>
+                        setCurrentResource({
+                          ...currentResource,
+                          address: e.target.value,
+                        })
+                      }
+                      placeholder="Full address"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">City *</label>
+                    <Input
+                      value={currentResource.city || ''}
+                      onChange={(e) =>
+                        setCurrentResource({
+                          ...currentResource,
+                          city: e.target.value,
+                        })
+                      }
+                      placeholder="City"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">State/Region *</label>
+                    <Input
+                      value={currentResource.state || ''}
+                      onChange={(e) =>
+                        setCurrentResource({
+                          ...currentResource,
+                          state: e.target.value,
+                        })
+                      }
+                      placeholder="State/Region"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Country *</label>
+                    <Input
+                      value={currentResource.country || ''}
+                      onChange={(e) =>
+                        setCurrentResource({
+                          ...currentResource,
+                          country: e.target.value,
+                        })
+                      }
+                      placeholder="Country"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Coordinates *</label>
+                    <div className="flex space-x-2">
+                      <Input
+                        value={currentResource.latitude || 0}
+                        placeholder="Latitude"
+                        readOnly
+                        className="text-muted-foreground"
+                        required
+                      />
+                      <Input
+                        value={currentResource.longitude || 0}
+                        placeholder="Longitude"
+                        readOnly
+                        className="text-muted-foreground"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Latitude</label>
-                  <Input
-                    type="number"
-                    step="any"
-                    value={currentResource.latitude || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        latitude: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Longitude</label>
-                  <Input
-                    type="number"
-                    step="any"
-                    value={currentResource.longitude || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        longitude: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Location *</label>
-                  <Input
-                    value={currentResource.address || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        address: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">City</label>
-                  <Input
-                    value={currentResource.city || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        city: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Country</label>
-                  <Input
-                    value={currentResource.country || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        country: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Phone</label>
-                  <Input
-                    type="tel"
-                    value={currentResource.phone || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        phone: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email</label>
+                  <label className="text-sm font-medium">Contact Email *</label>
                   <Input
                     type="email"
-                    value={currentResource.email || ""}
+                    value={currentResource.email || ''}
                     onChange={(e) =>
                       setCurrentResource({
                         ...currentResource,
                         email: e.target.value,
                       })
                     }
+                    placeholder="contact@example.com"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Operating Hours</label>
+                  <label className="text-sm font-medium">Phone Number</label>
                   <Input
-                    placeholder="e.g., Mon-Fri 9am-5pm"
-                    value={currentResource.operating_hours || ""}
+                    value={currentResource.phone || ''}
                     onChange={(e) =>
                       setCurrentResource({
                         ...currentResource,
-                        operating_hours: e.target.value,
+                        phone: e.target.value,
                       })
                     }
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Description</label>
-                  <textarea
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={currentResource.description || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        description: e.target.value,
-                      })
-                    }
-                    rows={3}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Notes</label>
-                  <textarea
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={currentResource.notes || ""}
-                    onChange={(e) =>
-                      setCurrentResource({
-                        ...currentResource,
-                        notes: e.target.value,
-                      })
-                    }
-                    rows={2}
+                    placeholder="+1 (555) 123-4567"
                   />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Operating Hours</label>
+                <Input
+                  value={currentResource.operating_hours || ''}
+                  onChange={(e) =>
+                    setCurrentResource({
+                      ...currentResource,
+                      operating_hours: e.target.value,
+                    })
+                  }
+                  placeholder="e.g., Mon-Fri 9:00 AM - 5:00 PM"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Additional Notes</label>
+                <textarea
+                  value={currentResource.notes || ''}
+                  onChange={(e) =>
+                    setCurrentResource({
+                      ...currentResource,
+                      notes: e.target.value,
+                    })
+                  }
+                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px]"
+                  placeholder="Any additional information or special instructions"
+                />
+              </div>
+
               <div className="flex justify-end space-x-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setIsDialogOpen(false);
-                    setCurrentResource(null);
-                  }}
+                  onClick={() => setIsDialogOpen(false)}
                 >
                   Cancel
                 </Button>
                 <Button type="submit">
-                  {loading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : currentResource.id ? (
-                    "Update"
-                  ) : (
-                    "Create"
-                  )}{" "}
-                  Resource
+                  {currentResource.id ? 'Update' : 'Create'} Resource
                 </Button>
               </div>
             </form>

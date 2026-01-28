@@ -2,38 +2,46 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, Info, AlertCircle, Bell } from 'lucide-react';
+import { Alert, AlertSeverity } from '@/types';
 
-const getAlertIcon = (severity: string) => {
+interface CriticalAlertProps {
+  alerts?: Alert[];
+  onDismiss?: (alertId: string) => void;
+}
+
+const getAlertIcon = (severity: AlertSeverity) => {
   switch (severity) {
-    case 'critical':
-      return <AlertTriangle size={20} className="text-white" />;
-    case 'danger':
-      return <AlertTriangle size={20} className="text-white" />;
-    case 'warning':
-      return <AlertCircle size={20} className="text-white" />;
-    case 'info':
-    default:
+    case 'INFO':
       return <Info size={20} className="text-white" />;
-  }
-};
-
-const getAlertColor = (severity: string) => {
-  switch (severity) {
-    case 'critical':
-      return 'bg-danger/90 border-danger/80 shadow-[0_0_30px_rgba(239,68,68,0.4)]';
-    case 'danger':
-      return 'bg-danger/90 border-danger/80 shadow-[0_0_30px_rgba(239,68,68,0.3)]';
-    case 'warning':
-      return 'bg-warning/90 border-warning/80 shadow-[0_0_30px_rgba(234,179,8,0.3)]';
-    case 'info':
+    case 'DANGER':
+      return <AlertTriangle size={20} className="text-white" />;
+    case 'WARNING':
+      return <AlertCircle size={20} className="text-white" />;
+    case 'CRITICAL':
     default:
-      return 'bg-primary/90 border-primary/80 shadow-[0_0_30px_rgba(30,58,138,0.3)]';
+      return <AlertTriangle size={20} className="text-white" />;
   }
 };
 
-export default function CriticalAlert() {
-  // const { alerts, dismissAlert } = useCriticalAlerts();
-  const [visibleAlert, setVisibleAlert] = React.useState<typeof alerts[number] | null>(null);
+const getAlertColor = (severity: AlertSeverity) => {
+  switch (severity) {
+    case 'CRITICAL':
+      return 'bg-red-600/90 border-red-600/80 shadow-[0_0_30px_rgba(239,68,68,0.4)]';
+    case 'DANGER':
+      return 'bg-red-500/90 border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.3)]';
+    case 'WARNING':
+      return 'bg-yellow-500/90 border-yellow-500/80 shadow-[0_0_30px_rgba(234,179,8,0.3)]';
+    case 'INFO':
+    default:
+      return 'bg-blue-600/90 border-blue-600/80 shadow-[0_0_30px_rgba(30,58,138,0.3)]';
+  }
+};
+
+export default function CriticalAlert({ 
+  alerts = [], 
+  onDismiss = () => {} 
+}: CriticalAlertProps) {
+  const [visibleAlert, setVisibleAlert] = React.useState<Alert | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
 
   // Auto-dismiss after 10 seconds, unless hovered
@@ -49,7 +57,7 @@ export default function CriticalAlert() {
 
   // Show the next alert when the current one is dismissed
   const handleDismiss = (alertId: string) => {
-    dismissAlert(alertId);
+    onDismiss(alertId);
     setVisibleAlert(null);
   };
 
@@ -70,21 +78,30 @@ export default function CriticalAlert() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-2000 w-[90%] max-w-lg ${getAlertColor(visibleAlert.severity)}`}
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-2000 w-[90%] max-w-lg rounded-xl border ${getAlertColor(visibleAlert.severity)}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="p-4 rounded-2xl flex items-start gap-4 border backdrop-blur-sm">
+        <div className="p-4 flex items-start gap-4">
           <div className="bg-white/20 p-2 rounded-full animate-pulse">
             {getAlertIcon(visibleAlert.severity)}
           </div>
           
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <Bell size={14} className="text-white/80" />
-              <h4 className="font-bold text-sm uppercase tracking-wider text-white/90">
-                {visibleAlert.title}
-              </h4>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <Bell size={14} className="text-white/80" />
+                <h4 className="font-bold text-sm uppercase tracking-wider text-white/90">
+                  {visibleAlert.title}
+                </h4>
+              </div>
+              <button 
+                onClick={() => handleDismiss(visibleAlert.id)}
+                className="text-white/70 hover:text-white transition-colors"
+                aria-label="Dismiss alert"
+              >
+                <X size={16} />
+              </button>
             </div>
             
             <p className="text-sm text-white/90 leading-relaxed">
@@ -98,27 +115,12 @@ export default function CriticalAlert() {
               </div>
             )}
             
-            {visibleAlert.affectedAreas && visibleAlert.affectedAreas.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                <span className="text-xs font-medium text-white/80">Affected Areas:</span>
-                <div className="flex flex-wrap gap-1">
-                  {visibleAlert.affectedAreas.map((area, index) => (
-                    <span key={index} className="text-xs bg-white/10 text-white/80 px-2 py-0.5 rounded-full">
-                      {area}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="mt-2 pt-2 border-t border-white/10">
+              <p className="text-xs text-white/60">
+                {new Date(visibleAlert.created_at).toLocaleString()}
+              </p>
+            </div>
           </div>
-          
-          <button 
-            onClick={() => handleDismiss(visibleAlert.id)}
-            className="p-1 hover:bg-white/20 rounded-full transition-colors shrink-0"
-            aria-label="Dismiss alert"
-          >
-            <X size={18} className="text-white" />
-          </button>
         </div>
       </motion.div>
     </AnimatePresence>
