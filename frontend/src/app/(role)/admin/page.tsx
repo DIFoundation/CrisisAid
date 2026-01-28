@@ -169,6 +169,14 @@ export default function AdminPage() {
               </button>
             ))}
 
+            <button
+              onClick={() => router.push('/userProfile')}
+              className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-light-bg/60 hover:bg-card-light/5`}
+            >
+              <span className="shrink-0"><User size={20} /></span>
+              {sidebarOpen && <span className="truncate">Profile</span>}
+            </button>
+
           </nav>
           {/* log out button */}
           <button
