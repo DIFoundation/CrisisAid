@@ -1,6 +1,193 @@
 # CrisisAid Backend API
 
-A backend API for managing disaster relief resources, emergency alerts, and community submissions.
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express.js-404D59?style=flat&logo=express)](https://expressjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-181818?style=flat&logo=supabase&logoColor=white)](https://supabase.com/)
+
+A robust, scalable backend API for CrisisAid, managing disaster relief resources, emergency alerts, and community submissions with real-time capabilities.
+
+## Features
+
+- **RESTful API** for managing resources, users, and alerts
+- **Real-time updates** using WebSockets
+- **JWT Authentication** with role-based access control
+- **File uploads** for resource images and documents
+- **Input validation** using Joi
+- **Rate limiting** for API endpoints
+- **Comprehensive error handling**
+- **Documentation** with Swagger/OpenAPI
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18.0.0 or later
+- npm or pnpm
+- Supabase account
+- PostgreSQL database
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/crisisaid-backend.git
+   cd crisisaid-backend
+   ```
+
+2. Install dependencies:
+   ```bash
+   pnpm install
+   # or
+   npm install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Update the `.env` file with your configuration:
+   ```env
+   # Server
+   PORT=5000
+   NODE_ENV=development
+   
+   # Supabase
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   SUPABASE_JWT_SECRET=your_jwt_secret
+   
+   # API
+   API_PREFIX=/api/v1
+   CORS_ORIGIN=http://localhost:3000
+   
+   # Rate Limiting
+   RATE_LIMIT_WINDOW_MS=15*60*1000  # 15 minutes
+   RATE_LIMIT_MAX=100  # Limit each IP to 100 requests per window
+   ```
+
+4. Run database migrations:
+   ```bash
+   pnpm migrate:up
+   ```
+
+5. Start the development server:
+   ```bash
+   pnpm dev
+   # or
+   npm run dev
+   ```
+
+6. The API will be available at `http://localhost:5000/api/v1`
+
+## Tech Stack
+
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express.js](https://expressjs.com/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **Authentication**: [JWT](https://jwt.io/)
+- **Validation**: [Joi](https://joi.dev/)
+- **Testing**: [Jest](https://jestjs.io/), [Supertest](https://github.com/visionmedia/supertest)
+- **Documentation**: [Swagger/OpenAPI](https://swagger.io/)
+
+## Project Structure
+
+```
+backend/
+├── src/
+│   ├── config/         # Configuration files
+│   ├── controllers/    # Route controllers
+│   ├── middlewares/    # Custom middlewares
+│   ├── models/         # Database models
+│   ├── routes/         # API routes
+│   ├── services/       # Business logic
+│   ├── types/          # TypeScript type definitions
+│   ├── utils/          # Utility functions
+│   ├── app.ts          # Express application
+│   └── server.ts       # Server startup
+├── tests/             # Test files
+├── migrations/        # Database migrations
+├── .env.example      # Environment variables example
+├── package.json
+└── tsconfig.json    # TypeScript configuration
+```
+
+## API Documentation
+
+Once the server is running, you can access the API documentation at:
+
+- **Swagger UI**: `http://localhost:5000/api-docs`
+- **OpenAPI JSON**: `http://localhost:5000/api-docs.json`
+
+## Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Run tests in watch mode
+pnpm test:watch
+```
+
+## Deployment
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Production database
+- Environment variables set
+
+### Using Docker
+
+1. Build the Docker image:
+   ```bash
+   docker build -t crisisaid-backend .
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -p 5000:5000 --env-file .env crisisaid-backend
+   ```
+
+### Using PM2 (Production)
+
+1. Install PM2 globally:
+   ```bash
+   npm install -g pm2
+   ```
+
+2. Start the application:
+   ```bash
+   NODE_ENV=production pm2 start dist/server.js --name crisisaid-backend
+   ```
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- All the amazing open-source projects that made this possible
+- Our wonderful contributors
+- The CrisisAid team for their hard work and dedication
+
+---
+
+Made with ❤️ by the CrisisAid Team
 
 ## Setup Instructions
 
