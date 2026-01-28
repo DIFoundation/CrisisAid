@@ -83,9 +83,9 @@ function LeafletMap({
       // @ts-ignore
       delete L.Icon.Default.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({
-        iconRetinaUrl: '/images/marker-icon-2x.png',
-        iconUrl: '/images/marker-icon.png',
-        shadowUrl: '/images/marker-shadow.png',
+        iconRetinaUrl: '/images/marker-icon.jpg',
+        iconUrl: '/images/marker-icon.jpg',
+        shadowUrl: '/images/marker-shadow.jpg',
       });
     }
     
@@ -166,7 +166,10 @@ function LeafletMap({
                   <h3 className="font-bold">{resource.name}</h3>
                   <p className="text-sm">{resource.address}</p>
                   <p className="text-xs text-gray-500">
-                    {resource.city}, {resource.state}
+                    {resource.city}, {resource.country}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {resource.type}
                   </p>
                 </div>
               </DynamicPopup>
