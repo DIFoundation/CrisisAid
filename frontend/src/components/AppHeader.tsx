@@ -10,6 +10,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 import { ResourceType } from '@/types';
 import Image from 'next/image';
+import { getAuthToken, removeAuthToken } from '@/lib/cookies';
 
 interface AppHeaderProps {
   searchPlaceholder?: string;
@@ -32,22 +33,23 @@ export default function AppHeader({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [resourceType, setResourceType] = useState<ResourceType>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getAuthToken());
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch?.(searchQuery, resourceType);
   };
 
-  const handleLogout = () => {
-    const token = Cookies.get('authToken');
+  const token = getAuthToken();
 
+  const handleLogout = async () => {
     if (!token) {
       toast.error('You are not logged in');
       return;
     }
 
     try {
-      fetch('https://crisisaid-backend.onrender.com/api/auth/logout', {
+      await fetch('https://crisisaid-backend.onrender.com/api/auth/signout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,8 +58,8 @@ export default function AppHeader({
       })
         .then(response => {
           if (response.ok) {
-            Cookies.remove('authToken');
-            Cookies.remove('userData');
+            removeAuthToken();
+            setIsLoggedIn(false);
             router.push('/user');
           }
         })
@@ -69,8 +71,12 @@ export default function AppHeader({
     }
   };
 
+  const handleLogin = () => {
+    router.push('/user');
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="sticky top-0 z-400 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container flex h-14 items-center px-4 md:px-6 justify-between">
         {/* Mobile Menu Button */}
         <div className="flex items-center space-x-2 md:hidden">
@@ -91,18 +97,27 @@ export default function AppHeader({
                   <Home className="mr-2 h-4 w-4" />
                   Home
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => router.push('/userProfile')}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Button>
-                <Button variant="ghost" className="justify-start" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
+                {isLoggedIn ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="justify-start"
+                      onClick={() => router.push('/userProfile')}
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Button>
+                    <Button variant="ghost" className="justify-start" onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="ghost" className="justify-start" onClick={handleLogin}>
+                    <User className="mr-2 h-4 w-4" />
+                    Login
+                  </Button>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
@@ -117,27 +132,7 @@ export default function AppHeader({
 
         {/* Logo / Title */}
         <div className="hidden md:flex items-center">
-        <svg
-                width="48"
-                height="48"
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-primary"
-              >
-                <path
-                  d="M24 4C13 4 4 13 4 24C4 35 13 44 24 44C35 44 44 35 44 24C44 13 35 4 24 4ZM24 40C15.2 40 8 32.8 8 24C8 15.2 15.2 8 24 8C32.8 8 40 15.2 40 24C40 32.8 32.8 40 24 40Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M24 12C20.7 12 18 14.7 18 18C18 21.3 20.7 24 24 24C27.3 24 30 21.3 30 18C30 14.7 27.3 12 24 12ZM24 20C22.9 20 22 19.1 22 18C22 16.9 22.9 16 24 16C25.1 16 26 16.9 26 18C26 19.1 25.1 20 24 20Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M24 26C20.1 26 16.3 27.5 13.5 30.2C14.9 32.9 17.8 34.8 21 35.3C21.1 33.4 22.1 32 24 32C25.9 32 26.9 33.4 27 35.3C30.2 34.8 33.1 32.9 34.5 30.2C31.7 27.5 27.9 26 24 26Z"
-                  fill="currentColor"
-                />
-              </svg>
+          <div className="text-2xl font-bold text-foreground">🌍</div>
         </div>
 
         {/* Search Bar */}
@@ -177,18 +172,27 @@ export default function AppHeader({
             <Home className="mr-2 h-4 w-4" />
             Home
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push('/userProfile')}
-          >
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+          {isLoggedIn ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push('/userProfile')}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={handleLogin}>
+              <User className="mr-2 h-4 w-4" />
+              Login
+            </Button>
+          )}
         </nav>
       </div>
     </header>
