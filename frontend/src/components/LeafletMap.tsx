@@ -75,12 +75,16 @@ interface LeafletMapProps {
   resources: Resource[];
   selectedResource: Resource | null;
   onResourceSelect: (resource: Resource) => void;
+  center: [number, number];
+  zoom: number;
 }
 
 const LeafletMap = ({
   resources,
   selectedResource,
   onResourceSelect,
+  center,
+  zoom,
 }: LeafletMapProps) => {
   const mapRef = useRef<L.Map>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -103,8 +107,8 @@ const LeafletMap = ({
   return (
     <div className="w-full h-full">
       <MapContainer
-        center={[51.505, -0.09]} // Default center (will be overridden by MapController)
-        zoom={13}
+        center={center || [0, 0]} // Default center (will be overridden by MapController)
+        zoom={zoom || 12}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
         ref={mapRef}

@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   const userData = request.cookies.get('data')?.value as { user: { role: Role } } | undefined;
 
   // console.log('token: ', token);
-  console.log('userData: ', userData);
+  console.info('userData: ' + userData);
 
   // If no token, redirect to login
   if (!token) {

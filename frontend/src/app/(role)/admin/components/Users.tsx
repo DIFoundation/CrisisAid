@@ -183,7 +183,7 @@ export default function Users() {
   // Get badge variant based on status
   const getStatusBadgeVariant = (status: boolean) => {
     switch (status) {
-      case true: return 'success';
+      case true: return 'default';
       case false: return 'destructive';
       default: return 'outline';
     }
