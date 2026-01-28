@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, MapPin, Clock, Phone, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail } from 'lucide-react';
+import { X, MapPin, Clock, Phone, AlertTriangle, CheckCircle, XCircle, User, Shield, Mail, Settings, Pin } from 'lucide-react';
 import { Resource } from '@/types';
 
 type ResourceDrawerProps = {
@@ -53,24 +53,24 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
     );
   };
 
-  const getAdminActions = () => {
-    return (
-      <div className="mt-6 pt-4 border-t border-border">
-        <h4 className="text-sm font-bold text-foreground/80 mb-3">Admin Actions</h4>
-        <div className="space-y-2">
-          <button className="w-full px-3 py-2 text-sm font-bold rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-            Edit Resource
-          </button>
-          <button className="w-full px-3 py-2 text-sm font-bold rounded-md bg-danger/10 text-danger hover:bg-danger/20 transition-colors">
-            Delete Resource
-          </button>
-        </div>
-      </div>
-    );
-  };
+  // const getAdminActions = () => {
+  //   return (
+  //     <div className="mt-6 pt-4 border-t border-border">
+  //       <h4 className="text-sm font-bold text-foreground/80 mb-3">Admin Actions</h4>
+  //       <div className="space-y-2">
+  //         <button className="w-full px-3 py-2 text-sm font-bold rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+  //           Edit Resource
+  //         </button>
+  //         <button className="w-full px-3 py-2 text-sm font-bold rounded-md bg-danger/10 text-danger hover:bg-danger/20 transition-colors">
+  //           Delete Resource
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-400 overflow-hidden">
       <div 
         className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
@@ -90,6 +90,10 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
                   <X className="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
+              <div className='flex items-center gap-2'>
+                <p className='text-sm font-bold text-foreground/80'>Resource Type:</p>
+                <h3 className="text-sm font-bold text-foreground/80">{resource.type}</h3>
+              </div>
               
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center">
@@ -108,10 +112,20 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
                 </div>
                 {getStatusBadge()}
               </div>
+
+              <div className="mt-4 flex items-center text-sm text-foreground/70">
+                <Pin className="w-4 h-4 mr-2 text-primary shrink-0" />
+                <span>{resource.latitude}N, {resource.longitude}E</span>
+              </div>
               
               <div className="mt-4 flex items-center text-sm text-foreground/70">
                 <MapPin className="w-4 h-4 mr-2 text-primary shrink-0" />
-                <span>{resource.latitude}N, {resource.longitude}E, {resource.address}, {resource.city}, {resource.country}</span>
+                <span>{resource.address}, {resource.city}, {resource.country}</span>
+              </div>
+
+              <div className="mt-2 flex items-center text-sm text-foreground/70">
+                <Clock className="w-4 h-4 mr-2 text-primary shrink-0" />
+                <span>Submitted at: {new Date(resource.created_at).toLocaleDateString()}</span>
               </div>
               
               <div className="mt-2 flex items-center text-sm text-foreground/70">
@@ -126,12 +140,25 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
                 </div>
               )}
               
-              {resource.capacity && (
+              {resource.capacity ? (
                 <div className="mt-4">
                   <h4 className="text-sm font-bold text-foreground/80 mb-1">Capacity</h4>
                   <p className="text-sm text-foreground/70">{resource.capacity} people</p>
                 </div>
-              )}
+              ) : ('')}
+              {resource.current_occupancy ? (
+                <div className="mt-4">
+                  <h4 className="text-sm font-bold text-foreground/80 mb-1">Current Occupancy</h4>
+                  <p className="text-sm text-foreground/70">{resource.current_occupancy} people</p>
+                </div>
+              ) : ('')}
+
+              {resource.operating_hours ? (
+                <div className="mt-4">
+                  <h4 className="text-sm font-bold text-foreground/80 mb-1">Operating Hours</h4>
+                  <p className="text-sm text-foreground/70">{resource.operating_hours}</p>
+                </div>
+              ) : ('')}
               
               {getContactInfo()}
               {/* {getHours()} */}
@@ -149,7 +176,7 @@ const ResourceDrawer: React.FC<ResourceDrawerProps> = ({ isOpen, onClose, resour
                 </div>
               )}
               
-              {getAdminActions()}
+              {/* {getAdminActions()} */}
             </div>
             
             <div className="mt-auto p-4 bg-card border-t border-border">
