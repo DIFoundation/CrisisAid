@@ -28,17 +28,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { AlertCircle, Edit, Trash2, Plus } from 'lucide-react';
+import LocationPicker from '@/components/LocationPicker';
+import { getAuthToken } from '@/lib/cookies';
+import { AlertSeverity } from '@/types';
 
 type Alert = {
   id: string;
   title: string;
   message: string;
-  severity: 'INFO' | 'WARNING' | 'DANGER' | 'CRITICAL';
+  severity: AlertSeverity;
+  active: boolean
   latitude: number;
   longitude: number;
   radius_km: number;
   address: string;
-  affected_areas: [string, string, string];
+  affected_areas: string[];
   instructions: string;
   start_time: string;
   end_time: string;
@@ -49,10 +53,11 @@ export default function Alerts() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentAlert, setCurrentAlert] = useState<Partial<Alert> | null>({
-    affected_areas: ['', '', ''],
+    affected_areas: [''],
   });
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState<string | null>(null);
+  const authToken = getAuthToken();
 
   // Fetch alerts on component mount
   useEffect(() => {
@@ -80,7 +85,7 @@ export default function Alerts() {
       longitude: 0,
       radius_km: 0,
       address: '',
-      affected_areas: ['', '', ''],
+      affected_areas: [''],
       instructions: '',
       start_time: new Date().toISOString().split('T')[0],
       end_time: new Date().toISOString().split('T')[0],
@@ -119,12 +124,13 @@ export default function Alerts() {
       radius_km: Number(currentAlert.radius_km) || 0.1,
       start_time: formatDate(currentAlert.start_time || new Date().toISOString()),
       end_time: formatDate(currentAlert.end_time || new Date(Date.now() + 86400000).toISOString()),
+      severity: currentAlert.severity as AlertSeverity,
     };
 
-    const url = currentAlert.id 
-      ? `https://crisisaid-backend.onrender.com/api/alerts/${currentAlert.id}` 
+    const url = currentAlert.id
+      ? `https://crisisaid-backend.onrender.com/api/alerts/${currentAlert.id}`
       : 'https://crisisaid-backend.onrender.com/api/alerts';
-    
+
     const method = currentAlert.id ? 'PUT' : 'POST';
 
     try {
@@ -132,7 +138,7 @@ export default function Alerts() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify(alertData),
       });
@@ -158,7 +164,7 @@ export default function Alerts() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${authToken}`,
         },
       });
 
@@ -192,17 +198,9 @@ export default function Alerts() {
     }
   };
 
-  const addAffectedArea = () => {
-    if (!currentAlert) return;
-    setCurrentAlert({
-      ...currentAlert,
-      affected_areas: ['', '', ''],
-    });
-  };
-
   const handleAffectedAreaChange = (index: number, value: string) => {
     if (!currentAlert || !currentAlert.affected_areas) return;
-    const newAffectedAreas = [...currentAlert.affected_areas] as [string, string, string];
+    const newAffectedAreas = [...currentAlert.affected_areas] as [string];
     newAffectedAreas[index] = value;
     setCurrentAlert({
       ...currentAlert,
@@ -244,7 +242,7 @@ export default function Alerts() {
                     {alert.severity}
                   </span>
                 </TableCell>
-                {/* <TableCell>{alert.active ? 'Active' : 'Inactive'}</TableCell> */}
+                <TableCell>{alert.active ? 'Active' : 'Inactive'}</TableCell>
                 <TableCell>{new Date(alert.start_time).toLocaleDateString()}</TableCell>
                 <TableCell>{alert.end_time ? new Date(alert.end_time).toLocaleDateString() : 'N/A'}</TableCell>
                 <TableCell>
@@ -300,7 +298,7 @@ export default function Alerts() {
                   </label>
                   <Select
                     value={currentAlert?.severity}
-                    onValueChange={(value) => handleSelectChange('severity', value as any)}
+                    onValueChange={(value) => handleSelectChange('severity', value as AlertSeverity)}
                   >
                     <SelectTrigger className='w-full'>
                       <SelectValue placeholder="Select severity" />
@@ -342,6 +340,20 @@ export default function Alerts() {
                   placeholder="Provide clear instructions for this alert"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Location</label>
+                <div className="h-64 rounded-lg overflow-hidden border">
+                  <LocationPicker
+                    formData={{
+                      latitude: currentAlert?.latitude || 0,
+                      longitude: currentAlert?.longitude || 0,
+                      address: currentAlert?.address || '',
+                    }}
+                    setFormData={setCurrentAlert}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -405,32 +417,58 @@ export default function Alerts() {
               </div>
 
               <div className="space-y-4 border rounded-md p-4">
-                <h4 className="font-medium">Affected Area</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Address</label>
-                    <Input
-                      value={currentAlert?.affected_areas?.[0] || ''}
-                      onChange={(e) => handleAffectedAreaChange(0, e.target.value)}
-                      placeholder="Address"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">City</label>
-                    <Input
-                      value={currentAlert?.affected_areas?.[1] || ''}
-                      onChange={(e) => handleAffectedAreaChange(1, e.target.value)}
-                      placeholder="City"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">State</label>
-                    <Input
-                      value={currentAlert?.affected_areas?.[2] || ''}
-                      onChange={(e) => handleAffectedAreaChange(2, e.target.value)}
-                      placeholder="State"
-                    />
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium">Affected Areas</h4>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!currentAlert) return;
+                      const newAreas = [...(currentAlert.affected_areas || []), ''];
+                      setCurrentAlert({
+                        ...currentAlert,
+                        affected_areas: newAreas as [string, ...string[]]
+                      });
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Area
+                  </Button>
+                </div>
+                
+                <div className="space-y-3">
+                  {(currentAlert?.affected_areas || ['']).map((area, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={area}
+                        onChange={(e) => handleAffectedAreaChange(index, e.target.value)}
+                        placeholder={`Affected area #${index + 1}`}
+                        className="flex-1"
+                      />
+                      {(currentAlert?.affected_areas?.length || 0) > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-500 hover:bg-red-50"
+                          onClick={() => {
+                            if (!currentAlert?.affected_areas) return;
+                            const newAreas = [...currentAlert.affected_areas];
+                            newAreas.splice(index, 1);
+                            setCurrentAlert({
+                              ...currentAlert,
+                              affected_areas: newAreas.length > 0 
+                                ? newAreas as [string, ...string[]] 
+                                : ['']
+                            });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
