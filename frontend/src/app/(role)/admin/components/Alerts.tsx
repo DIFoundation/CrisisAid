@@ -313,33 +313,35 @@ export default function Alerts() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-medium">
-                  Message *
-                </label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  value={currentAlert?.message || ''}
-                  onChange={handleChange}
-                  rows={3}
-                  required
-                />
-              </div>
+              <div className="flex gap-4">
+                <div className='space-y-2 w-full'>
+                  <label htmlFor="message" className="text-sm font-medium">
+                    Message *
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={currentAlert?.message || ''}
+                    onChange={handleChange}
+                    rows={3}
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label htmlFor="instructions" className="text-sm font-medium">
-                  Instructions *
-                </label>
-                <Textarea
-                  id="instructions"
-                  name="instructions"
-                  value={currentAlert?.instructions || ''}
-                  onChange={handleChange}
-                  rows={3}
-                  placeholder="Provide clear instructions for this alert"
-                  required
-                />
+                <div className="space-y-2 w-full">
+                  <label htmlFor="instructions" className="text-sm font-medium">
+                    Instructions *
+                  </label>
+                  <Textarea
+                    id="instructions"
+                    name="instructions"
+                    value={currentAlert?.instructions || ''}
+                    onChange={handleChange}
+                    rows={3}
+                    placeholder="Provide clear instructions for this alert"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -436,7 +438,7 @@ export default function Alerts() {
                     Add Area
                   </Button>
                 </div>
-                
+
                 <div className="space-y-3">
                   {(currentAlert?.affected_areas || ['']).map((area, index) => (
                     <div key={index} className="flex items-center gap-2">
@@ -458,8 +460,8 @@ export default function Alerts() {
                             newAreas.splice(index, 1);
                             setCurrentAlert({
                               ...currentAlert,
-                              affected_areas: newAreas.length > 0 
-                                ? newAreas as [string, ...string[]] 
+                              affected_areas: newAreas.length > 0
+                                ? newAreas as [string, ...string[]]
                                 : ['']
                             });
                           }}

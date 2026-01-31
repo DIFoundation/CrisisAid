@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 
 export default function UserProfile() {
   const [user, setUser] = useState<User | null>(null);
@@ -38,7 +39,8 @@ export default function UserProfile() {
         setUser(userData);
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        toast.error('Failed to load user profile');
+        toast.error('Failed to load user profile, kindly try to log in again');
+        router.push('/user  ');
       } finally {
         setLoading(false);
       }
@@ -105,7 +107,10 @@ export default function UserProfile() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">My Profile</h1>
+          <div className="flex items-center gap-6">
+            <ArrowLeft size={20} onClick={() => router.back()} />
+            <h1 className="text-3xl font-bold">My Profile</h1>
+          </div>
           <Button onClick={handleEditProfile} variant="outline">
             Edit Profile
           </Button>
@@ -118,6 +123,12 @@ export default function UserProfile() {
               <Badge variant={user.role === 'ADMIN' ? 'destructive' : 'default'}>
                 {user.role}
               </Badge>
+
+              {user.role === 'ADMIN' && (
+                <Button variant="default" onClick={() => router.push('/admin')}>
+                  Admin Dashboard
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
