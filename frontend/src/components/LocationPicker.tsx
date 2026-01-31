@@ -49,8 +49,9 @@ interface LocationPickerProps {
     city?: string;
     state?: string;
     country?: string;
+    [key: string]: any; // Allow for additional form fields
   };
-  setFormData: (location: LocationData) => void;
+  setFormData: React.Dispatch<React.SetStateAction<any>> | ((data: any) => void);
 }
 
 export default function LocationPicker({ formData, setFormData }: LocationPickerProps) {
@@ -59,8 +60,13 @@ export default function LocationPicker({ formData, setFormData }: LocationPicker
   const updateLocationData = async (lat: number, lng: number) => {
     setLoading(true);
 
-    // Move pin immediately
-    setFormData({ lat, lng });
+    // Update only the location fields while preserving other form data
+    setFormData((prev: any) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+      address: prev.address || ''
+    }));
 
     try {
       const res = await fetch(
@@ -69,14 +75,15 @@ export default function LocationPicker({ formData, setFormData }: LocationPicker
       const data = await res.json();
       const addr = data.address || {};
 
-      setFormData({
-        lat,
-        lng,
-        address: data.display_name,
+      setFormData((prev: any) => ({
+        ...prev,
+        latitude: lat,
+        longitude: lng,
+        address: data.display_name || prev.address,
         city: addr.city || addr.town || addr.village || "",
         state: addr.state || "",
-        country: addr.country || "",
-      });
+        country: addr.country || ""
+      }));
     } catch (err) {
       console.error("Geocoding failed", err);
     } finally {

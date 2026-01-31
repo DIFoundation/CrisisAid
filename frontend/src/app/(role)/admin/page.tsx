@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import { getAuthToken } from '@/lib/cookies';
-import { LayoutDashboard, Gem, Send, TriangleAlert, Users, User, LogOut, Home } from 'lucide-react';
+import { LayoutDashboard, Gem, Send, TriangleAlert, Users, User, LogOut, Home, Map } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 
@@ -160,6 +160,14 @@ export default function AdminPage() {
             <Home size={20} />
             {sidebarOpen && <span>Home</span>}
           </button>
+
+          <button 
+            onClick={() => router.push('/map')}
+            className='w-full flex items-center gap-3 p-5 text-light-bg/60 hover:bg-card-light/5 rounded-lg transition-colors'>
+            <Map size={20} />
+            {sidebarOpen && <span>Map</span>}
+          </button>
+
           <nav className="flex-1 p-2 space-y-1">
             {tabs.map((tab) => (
               <button

@@ -52,12 +52,7 @@ export default function LandingPage() {
       <header className="relative pt-16 pb-24 px-6 overflow-hidden bg-linear-to-br from-primary/5 via-background to-primary/5">
         <div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-center"></div>
         
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          {/* <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium">
-            <Zap className="h-4 w-4" />
-            <span>Real-time emergency response</span>
-          </div> */}
-          
+        <div className="max-w-5xl mx-auto text-center relative z-10">          
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/80 bg-clip-text text-transparent mb-6">
             Emergency Help <span className="text-primary">When Every Second Counts</span>
           </h1>
@@ -73,12 +68,6 @@ export default function LandingPage() {
             >
               View Emergency Map
             </Link>
-            {/* <Link 
-              href="/submit" 
-              className="px-8 py-4 bg-background text-foreground hover:bg-accent/50 rounded-xl font-bold text-lg transition-all border border-border hover:border-primary/50"
-            >
-              Submit a Resource
-            </Link> */}
           </div>
         </div>
       </header>

@@ -8,189 +8,113 @@ import { Gem, Send, TriangleAlert, Users } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { getAuthToken } from '@/lib/cookies';
 
 interface Stats {
-    alerts: {
-        active: number;
-        critical: number;
-        total: number;
-    }
-    recentActivity : {
-        resources: [];
-        submissions: [];
-    }
-    resources: {
-        available: number;
-        pendingVerification: number;
-        total: number;
-        verified: number;
-    }
-    submissions: {
-        approved: number;
-        pending: number;
-        rejected: number;
-        total: number;
-    }
-    users: {
-        total: number;
-        verified: number;
-    }
+  alerts: {
+    active: number;
+    critical: number;
+    total: number;
+  }
+  recentActivity: {
+    resources: [];
+    submissions: [];
+  }
+  resources: {
+    available: number;
+    pendingVerification: number;
+    total: number;
+    verified: number;
+  }
+  submissions: {
+    approved: number;
+    pending: number;
+    rejected: number;
+    total: number;
+  }
+  users: {
+    total: number;
+    verified: number;
+  }
+}
+
+interface Distribution {
+  CLOTHING: number;
+  FOOD: number;
+  MEDICAL: number;
+  SHELTER: number;
 }
 
 export default function Dashboard() {
   const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null);
+  const [distribution, setDistribution] = useState<Distribution | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const token = getAuthToken()
 
-//   useEffect(() => {
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('https://crisisaid-backend.onrender.com/api/dashboard/stats', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-//     // const fetchTotalResources = async () => {
-//     //   try {
-//     //     const token = localStorage.getItem('authToken');
-//     //     const response = await fetch('https://crisisaid-backend.onrender.com/api/resources', {
-//     //       headers: {
-//     //         'Content-Type': 'application/json',
-//     //         'Authorization': `Bearer ${token}`,
-//     //       },
-//     //     });
+        // console.log('response: ', response)
 
-//     //     if (!response.ok) {
-//     //       throw new Error('Failed to fetch total resources');
-//     //     }
+        if (!response.ok) {
+          // throw new Error('Failed to fetch stats');
+          toast.error('Unauthorized, please login');
+          router.push('/user');
+          return;
+        }
 
-//     //     const data = await response.json();
-//     //     setStats((prev) => ({
-//     //       ...prev,
-//     //       totalResources: data.totalResources,
-//     //     }));
-//     //   } catch (err) {
-//     //     setError(err as string || 'Failed to load total resources');
-//     //     console.error('Total resources error:', err);
-//     //   }
-//     // };
+        const data = await response.json();
+        setStats(data);
+        // console.log('stat data: ', data)
+      } catch (err) {
+        setError(err as string || 'Failed to load stats');
+        console.error('Stats error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//     const fetchPendingSubmissions = async () => {
-//       try {
-//         const token = localStorage.getItem('authToken');
-//         const response = await fetch('https://crisisaid-backend.onrender.com/api/submissions/pending', {
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${token}`,
-//           },
-//         });
+    const fetchDistribution = async () => {
+      try {
+        const response = await fetch('https://crisisaid-backend.onrender.com/api/dashboard/resources/distribution', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-//         if (!response.ok) {
-//           throw new Error('Failed to fetch pending submissions');
-//         }
+        // console.log('response: ', response)
 
-//         const data = await response.json();
-//         setStats((prev) => ({
-//           ...prev,
-//           pendingSubmissions: data.pendingSubmissions,
-//         }));
-//       } catch (err) {
-//         setError(err as string || 'Failed to load pending submissions');
-//         console.error('Pending submissions error:', err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+        if (!response.ok) {
+          // throw new Error('Failed to fetch stats');
+          toast.error('Unauthorized, please login');
+          router.push('/user');
+          return;
+        }
 
-//     const fetchActiveAlerts = async () => {
-//       try {
-//         const token = localStorage.getItem('authToken');
-//         const response = await fetch('https://crisisaid-backend.onrender.com/api/alerts/active', {
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${token}`,
-//           },
-//         });
+        const data = await response.json();
+        setDistribution(data);
+        console.log('distribution data: ', data)
+      } catch (err) {
+        setError(err as string || 'Failed to load stats');
+        console.error('Stats error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//         if (!response.ok) {
-//           throw new Error('Failed to fetch active alerts');
-//         }
-
-//         const data = await response.json();
-//         setStats((prev) => ({
-//           ...prev,
-//           activeAlerts: data.activeAlerts,
-//         }));
-//       } catch (err) {
-//         setError(err as string || 'Failed to load active alerts');
-//         console.error('Active alerts error:', err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     const fetchTotalUsers = async () => {
-//       try {
-//         const token = localStorage.getItem('authToken');
-//         const response = await fetch('https://crisisaid-backend.onrender.com/api/users', {
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${token}`,
-//           },
-//         });
-
-//         if (!response.ok) {
-//           throw new Error('Failed to fetch total users');
-//         }
-
-//         const data = await response.json();
-//         console.log('user data: ', data);
-//         setStats((prev) => ({
-//           ...prev,
-//           totalUsers: data.length,
-//         }));
-//       } catch (err) {
-//         setError(err as string || 'Failed to load total users');
-//         console.error('Total users error:', err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     // fetchTotalResources();
-//     fetchPendingSubmissions();
-//     fetchActiveAlerts();
-//     fetchTotalUsers();
-//   }, []);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const token = Cookies.get('authToken');
-                const response = await fetch('https://crisisaid-backend.onrender.com/api/dashboard/stats', {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                // console.log('response: ', response)
-
-                if (!response.ok) {
-                    // throw new Error('Failed to fetch stats');
-                    toast.error('Unauthorized, please login');
-                    router.push('/user');
-                    return;
-                }
-
-                const data = await response.json();
-                setStats(data);
-                // console.log('stat data: ', data)
-            } catch (err) {
-                setError(err as string || 'Failed to load stats');
-                console.error('Stats error:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStats();
-    }, [])
+    fetchStats();
+    fetchDistribution();
+  }, [])
 
   if (loading) {
     return (
@@ -209,26 +133,50 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-      
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard 
-          title="Total Resources" 
-          value={stats?.resources.total || 0} 
+        <StatCard
+          title="Total Resources"
+          value={stats?.resources.total || 0}
           icon={<Gem className="h-4 w-4" />}
         />
-        <StatCard 
-          title="Pending Submissions" 
-          value={stats?.submissions.pending || 0} 
+        <StatCard
+          title="Pending Submissions"
+          value={stats?.submissions.pending || 0}
           icon={<Send className="h-4 w-4" />}
         />
-        <StatCard 
-          title="Active Alerts" 
-          value={stats?.alerts.total || 0} 
+        <StatCard
+          title="Active Alerts"
+          value={stats?.alerts.total || 0}
           icon={<TriangleAlert className="h-4 w-4" />}
         />
-        <StatCard 
-          title="Total Users" 
-          value={stats?.users.total || 0} 
+        <StatCard
+          title="Total Users"
+          value={stats?.users.total || 0}
+          icon={<Users className="h-4 w-4" />}
+        />
+      </div>
+
+      <h1 className="text-2xl font-bold">Resources Distribution</h1>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Clothing"
+          value={distribution?.CLOTHING || 0}
+          icon={<Gem className="h-4 w-4" />}
+        />
+        <StatCard
+          title="Food"
+          value={distribution?.FOOD || 0}
+          icon={<Send className="h-4 w-4" />}
+        />
+        <StatCard
+          title="Medical"
+          value={distribution?.MEDICAL || 0}
+          icon={<TriangleAlert className="h-4 w-4" />}
+        />
+        <StatCard
+          title="Shelter"
+          value={distribution?.SHELTER || 0}
           icon={<Users className="h-4 w-4" />}
         />
       </div>

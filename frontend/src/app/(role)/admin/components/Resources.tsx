@@ -41,6 +41,7 @@ type Resource = {
   name: string;
   type: ResourceType;
   status: ResourceStatus;
+  verified: boolean;
   description: string;
   capacity: number;
   current_occupancy: number;
@@ -358,6 +359,7 @@ export default function Resources() {
               <TableHead>Name</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Verified</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Operating Hours</TableHead>
@@ -393,6 +395,7 @@ export default function Resources() {
                         .join(" ")}
                     </Badge>
                   </TableCell>
+                  <TableCell>{resource.verified ? "Yes" : "No"}</TableCell>
                   <TableCell>{resource.capacity}</TableCell>
                   <TableCell className="max-w-[200px] truncate">
                     {resource.address}
